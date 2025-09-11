@@ -4,82 +4,53 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <nav class="navbar">
+    <!--Logo & Tittle  -->
+    <div class="logo">
+      <span class="logo-icon">F</span>
+      <div>
+        <h1 class="name">Farel Yuda Pratama</h1>
+        <p class="subtitle">Aspiring Software Engineer</p>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <RouterView />
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--nav-bg);
+  color: var(--text-color);
+  padding: 0.8rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  transition: background 0.3s ease;
 }
 
 .logo {
-  display: block;
-  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.logo-icon {
+  font-size: 1.8rem;
+  color: #a855f7;
+  font-weight: bold;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.name {
+  font-size: 1rem;
+  margin: 0;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.subtitle {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 </style>
