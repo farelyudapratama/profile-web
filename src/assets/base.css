@@ -1,52 +1,134 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* Custom theme color palette */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+  /* Primary Purple - Dark Theme */
+  --primary-dark-main: #9333ea;
+  --primary-dark-50: #f3e8ff;
+  --primary-dark-900: #351254;
+  --primary-dark-base: #6b21a8;
+  --primary-dark-light: #dcb1e7;
+  --primary-dark-darker: #270c3c;
 
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+  /* Primary Light */
+  --primary-light-base: #f9fafb;
+  --primary-light-50: #fdfdfe;
+  --primary-light-900: #5a5a5a;
 
-  --vt-c-indigo: #2c3e50;
+  /* Secondary Background - Dark Theme */
+  --secondary-bg-dark: #1f2937;
+  --secondary-bg-dark-50: #c0c3c7;
+  --secondary-bg-dark-900: #080c0f;
 
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+  /* Secondary Background - Light Theme */
+  --secondary-bg-light: #f3f4f6;
+  --secondary-bg-light-50: #fcfcfc;
+  --secondary-bg-light-900: #575859;
 
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  /* Secondary Text - Dark Theme */
+  --secondary-text-dark: #d1d5db;
+  --secondary-text-dark-50: #f2f3f5;
+  --secondary-text-dark-900: #4b4d4f;
+
+  /* Secondary Text - Light Theme */
+  --secondary-text-light: #e5e7eb;
+  --secondary-text-light-50: #f8f8f9;
+  --secondary-text-light-900: #525355;
+
+  /* Divider */
+  --divider-base: #374151;
+  --divider-50: #c7cace;
+  --divider-900: #14171d;
+
+  /* Accent Colors - Dark Theme */
+  --accent-blue-dark: #22d3ee;
+  --accent-blue-dark-50: #c1f3fa;
+  --accent-blue-dark-900: #0c4c56;
+
+  --accent-green-dark: #10b981;
+  --accent-green-dark-50: #bcedcb;
+  --accent-green-dark-900: #06432e;
+
+  --accent-red-dark: #ff4444;
+  --accent-red-dark-50: #fbcbcb;
+  --accent-red-dark-900: #561818;
+
+  /* Accent Colors - Light Theme */
+  --accent-blue-light: #67e6dd;
+  --accent-blue-light-50: #c8f8f5;
+  --accent-blue-light-900: #253530;
+
+  --accent-green-light: #34d399;
+  --accent-green-light-50: #c6f3e2;
+  --accent-green-light-900: #134c37;
+
+  --accent-red-light: #ff6961;
+  --accent-red-light-50: #ffd5d3;
+  --accent-red-light-900: #5c2623;
+
+  /* Primary Purple - Light Theme */
+  --primary-light-main: #7c3aed;
+  --primary-light-50: #dac8fa;
+  --primary-light-900: #2d1555;
+  --primary-light-alt: #e9d5ff;
+  --primary-light-alt-50: #f9f3ff;
+  --primary-light-alt-900: #544d5c;
 }
 
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+/* Light theme semantic color variables */
+:root,
+.light-theme {
+  --color-background: var(--secondary-bg-light);
+  --color-background-soft: var(--secondary-bg-light-50);
+  --color-background-mute: var(--primary-light-base);
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
+  --color-border: var(--divider-50);
+  --color-border-hover: var(--divider-base);
 
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
+  --color-heading: var(--primary-light-main);
+  --color-text: var(--secondary-text-light-900);
+
+  --color-primary: var(--primary-light-main);
+  --color-accent-blue: var(--accent-blue-light);
+  --color-accent-green: var(--accent-green-light);
+  --color-accent-red: var(--accent-red-light);
 
   --section-gap: 160px;
 }
 
+/* Dark theme semantic color variables */
+.dark-theme {
+  --color-background: var(--secondary-bg-dark);
+  --color-background-soft: var(--secondary-bg-dark-50);
+  --color-background-mute: var(--secondary-bg-dark-900);
+
+  --color-border: var(--divider-base);
+  --color-border-hover: var(--divider-50);
+
+  --color-heading: var(--primary-dark-main);
+  --color-text: var(--secondary-text-dark);
+
+  --color-primary: var(--primary-dark-main);
+  --color-accent-blue: var(--accent-blue-dark);
+  --color-accent-green: var(--accent-green-dark);
+  --color-accent-red: var(--accent-red-dark);
+}
+
+/* System preference dark mode */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
+  :root:not(.light-theme):not(.dark-theme) {
+    --color-background: var(--secondary-bg-dark);
+    --color-background-soft: var(--secondary-bg-dark-50);
+    --color-background-mute: var(--secondary-bg-dark-900);
 
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
+    --color-border: var(--divider-base);
+    --color-border-hover: var(--divider-50);
 
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
+    --color-heading: var(--primary-dark-main);
+    --color-text: var(--secondary-text-dark);
+
+    --color-primary: var(--primary-dark-main);
+    --color-accent-blue: var(--accent-blue-dark);
+    --color-accent-green: var(--accent-green-dark);
+    --color-accent-red: var(--accent-red-dark);
   }
 }
 
@@ -82,4 +164,181 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Theme Utility Classes */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.bg-background {
+  background-color: var(--color-background);
+}
+.bg-background-soft {
+  background-color: var(--color-background-soft);
+}
+.bg-background-mute {
+  background-color: var(--color-background-mute);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+.text-heading {
+  color: var(--color-heading);
+}
+.text-default {
+  color: var(--color-text);
+}
+
+.border-default {
+  border-color: var(--color-border);
+}
+.border-hover {
+  border-color: var(--color-border-hover);
+}
+
+.accent-blue {
+  color: var(--color-accent-blue);
+}
+.accent-green {
+  color: var(--color-accent-green);
+}
+.accent-red {
+  color: var(--color-accent-red);
+}
+
+.bg-accent-blue {
+  background-color: var(--color-accent-blue);
+}
+.bg-accent-green {
+  background-color: var(--color-accent-green);
+}
+.bg-accent-red {
+  background-color: var(--color-accent-red);
+}
+
+/* Button Variants */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-background-soft);
+  border-color: var(--color-border-hover);
+}
+
+.btn-accent-blue {
+  background-color: var(--color-accent-blue);
+  color: white;
+}
+
+.btn-accent-green {
+  background-color: var(--color-accent-green);
+  color: white;
+}
+
+.btn-accent-red {
+  background-color: var(--color-accent-red);
+  color: white;
+}
+
+/* Card Component */
+.card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-soft {
+  background-color: var(--color-background-soft);
+}
+
+/* Input Styles */
+.input {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Typography */
+.heading-1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.2;
+}
+
+.heading-2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: var(--color-heading);
+  line-height: 1.3;
+}
+
+.heading-3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-heading);
+  line-height: 1.3;
+}
+
+.text-muted {
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 1.5rem 0;
+}
+
+/* Theme transition classes */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
