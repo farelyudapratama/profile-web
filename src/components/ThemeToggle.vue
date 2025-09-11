@@ -1,3 +1,35 @@
+<script setup lang="ts">
+import { useThemeStore } from '@/stores/theme'
+
+const themeStore = useThemeStore()
+
+function toggleTheme() {
+  themeStore.toggleTheme()
+}
+
+function getCurrentThemeLabel() {
+  const labels = {
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+  }
+  return labels[themeStore.themeMode]
+}
+
+function getNextThemeLabel() {
+  const modes = ['light', 'dark', 'system'] as const
+  const currentIndex = modes.indexOf(themeStore.themeMode)
+  const nextIndex = (currentIndex + 1) % 3
+  const nextMode = modes[nextIndex]
+  const labels: Record<(typeof modes)[number], string> = {
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+  }
+  return labels[nextMode]
+}
+</script>
+
 <template>
   <button
     @click="toggleTheme"
@@ -69,38 +101,6 @@
     <span class="theme-label">{{ getCurrentThemeLabel() }}</span>
   </button>
 </template>
-
-<script setup lang="ts">
-import { useThemeStore } from '@/stores/theme'
-
-const themeStore = useThemeStore()
-
-function toggleTheme() {
-  themeStore.toggleTheme()
-}
-
-function getCurrentThemeLabel() {
-  const labels = {
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-  }
-  return labels[themeStore.themeMode]
-}
-
-function getNextThemeLabel() {
-  const modes = ['light', 'dark', 'system'] as const
-  const currentIndex = modes.indexOf(themeStore.themeMode)
-  const nextIndex = (currentIndex + 1) % 3
-  const nextMode = modes[nextIndex]
-  const labels: Record<(typeof modes)[number], string> = {
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-  }
-  return labels[nextMode]
-}
-</script>
 
 <style scoped>
 .theme-toggle {
