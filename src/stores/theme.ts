@@ -1,17 +1,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { defineStore } from 'pinia'
 
-export type ThemeMode = 'light' | 'dark' | 'system'
+export type ThemeMode = 'light' | 'dark'
 
 export const useThemeStore = defineStore('theme', () => {
   // State
-  const themeMode = ref<ThemeMode>('system')
+  const themeMode = ref<ThemeMode>('light')
 
   // Load theme from localStorage on store initialization
   const loadTheme = () => {
     const savedTheme = localStorage.getItem('theme-mode') as ThemeMode
-    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
       themeMode.value = savedTheme
+    } else {
+      // Default to system preference if no valid theme is saved
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      themeMode.value = prefersDark ? 'dark' : 'light'
     }
   }
 
@@ -23,9 +27,6 @@ export const useThemeStore = defineStore('theme', () => {
 
   // Computed
   const isDark = computed(() => {
-    if (themeMode.value === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
     return themeMode.value === 'dark'
   })
 
@@ -35,16 +36,26 @@ export const useThemeStore = defineStore('theme', () => {
 
   // Actions
   function setTheme(mode: ThemeMode) {
-    themeMode.value = mode
-    localStorage.setItem('theme-mode', mode)
-    applyTheme()
+    const apply = () => {
+      themeMode.value = mode
+      localStorage.setItem('theme-mode', mode)
+      applyTheme()
+    }
+
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        apply()
+      })
+    } else {
+      apply()
+    }
   }
 
+
   function toggleTheme() {
-    const modes: ThemeMode[] = ['light', 'dark', 'system']
-    const currentIndex = modes.indexOf(themeMode.value)
-    const nextIndex = (currentIndex + 1) % modes.length
-    setTheme(modes[nextIndex])
+    // Simply toggle between light and dark
+    const newTheme: ThemeMode = themeMode.value === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
   }
 
   function applyTheme() {
@@ -53,12 +64,8 @@ export const useThemeStore = defineStore('theme', () => {
     // Remove existing theme classes
     root.classList.remove('light-theme', 'dark-theme')
 
-    // Apply theme class based on mode
-    if (themeMode.value !== 'system') {
-      root.classList.add(`${themeMode.value}-theme`)
-    } else {
-      // In system mode, we don't add a class, and let the media query handle it
-    }
+    // Apply theme class based on current theme
+    root.classList.add(`${themeMode.value}-theme`)
 
     // Update meta theme-color for mobile browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
@@ -71,14 +78,6 @@ export const useThemeStore = defineStore('theme', () => {
   // Initialize theme on store creation
   function initTheme() {
     applyTheme()
-
-    // Listen for system theme changes when in system mode
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', () => {
-      if (themeMode.value === 'system') {
-        applyTheme()
-      }
-    })
   }
 
   return {

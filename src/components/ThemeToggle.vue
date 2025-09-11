@@ -11,22 +11,13 @@ function getCurrentThemeLabel() {
   const labels = {
     light: 'Light',
     dark: 'Dark',
-    system: 'System',
   }
   return labels[themeStore.themeMode]
 }
 
 function getNextThemeLabel() {
-  const modes = ['light', 'dark', 'system'] as const
-  const currentIndex = modes.indexOf(themeStore.themeMode)
-  const nextIndex = (currentIndex + 1) % 3
-  const nextMode = modes[nextIndex]
-  const labels: Record<(typeof modes)[number], string> = {
-    light: 'Light',
-    dark: 'Dark',
-    system: 'System',
-  }
-  return labels[nextMode]
+  // Simple toggle between light and dark
+  return themeStore.themeMode === 'light' ? 'Dark' : 'Light'
 }
 </script>
 
@@ -40,10 +31,7 @@ function getNextThemeLabel() {
     <div class="theme-icon">
       <!-- Sun Icon for Light Theme -->
       <svg
-        v-if="
-          themeStore.themeMode === 'light' ||
-          (themeStore.themeMode === 'system' && !themeStore.isDark)
-        "
+        v-if="themeStore.themeMode === 'light'"
         xmlns="http://www.w3.org/2000/svg"
         width="20"
         height="20"
@@ -62,25 +50,6 @@ function getNextThemeLabel() {
 
       <!-- Moon Icon for Dark Theme -->
       <svg
-        v-else-if="
-          themeStore.themeMode === 'dark' ||
-          (themeStore.themeMode === 'system' && themeStore.isDark)
-        "
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-      </svg>
-
-      <!-- System Icon when following system preference -->
-      <svg
         v-else
         xmlns="http://www.w3.org/2000/svg"
         width="20"
@@ -92,9 +61,7 @@ function getNextThemeLabel() {
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-        <line x1="8" y1="21" x2="16" y2="21" />
-        <line x1="12" y1="17" x2="12" y2="21" />
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </svg>
     </div>
 

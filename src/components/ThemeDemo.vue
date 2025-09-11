@@ -69,9 +69,7 @@
     <div class="card theme-info">
       <h3 class="heading-3">Theme Information</h3>
       <div class="theme-details">
-        <p><strong>Current Mode:</strong> {{ themeStore.themeMode }}</p>
-        <p><strong>Active Theme:</strong> {{ themeStore.currentTheme }}</p>
-        <p><strong>System Preference:</strong> {{ systemPreference }}</p>
+        <p><strong>Current Theme:</strong> {{ themeStore.themeMode }}</p>
       </div>
     </div>
   </div>
@@ -83,18 +81,7 @@ import { useThemeStore } from '@/stores/theme'
 
 const themeStore = useThemeStore()
 
-const systemPreference = ref<string>('unknown')
-
-onMounted(() => {
-  // Get system preference
-  const isDarkSystem = window.matchMedia('(prefers-color-scheme: dark)').matches
-  systemPreference.value = isDarkSystem ? 'dark' : 'light'
-
-  // Listen for system preference changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    systemPreference.value = e.matches ? 'dark' : 'light'
-  })
-})
+// No system preference needed for simplified theme system
 </script>
 
 <style scoped>
