@@ -43,8 +43,16 @@ export const useThemeStore = defineStore('theme', () => {
     }
 
     if (document.startViewTransition) {
-      document.startViewTransition(() => {
+      const transition = document.startViewTransition(() => {
         apply()
+      })
+
+      // sementara disable interaksi
+      document.documentElement.classList.add('is-transitioning')
+
+      // kalau transisi selesai, aktifkan lagi
+      transition.finished.finally(() => {
+        document.documentElement.classList.remove('is-transitioning')
       })
     } else {
       apply()

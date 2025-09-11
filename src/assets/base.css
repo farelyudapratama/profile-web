@@ -1,21 +1,22 @@
-/* ::view-transition-group(root) {
-  animation-duration: 2s;
-} */
+html.is-transitioning {
+  cursor: wait;
+  pointer-events: none;
+}
 
 ::view-transition-old(root) {
-  animation-delay: 1500ms;
+  animation-delay: 1000ms;
 }
 
 ::view-transition-new(root) {
-  animation: circle-in 1500ms;
+  animation: circle-in 1000ms;
 }
 
 @keyframes circle-in {
   from {
-    clip-path: circle(0% at 50% 50%);
+    clip-path: circle(0% at 100% 0%);
   }
   to {
-    clip-path: circle(100% at 50% 50%);
+    clip-path: circle(200% at 100% 0%);
   }
 }
 
@@ -31,7 +32,7 @@
 
   /* Primary Light */
   --primary-light-base: #f9fafb;
-  --primary-light-50: #fdfdfe;
+  --primary-light-50: #eff0ec;
   --primary-light-900: #5a5a5a;
 
   /* Secondary Background - Dark Theme */
@@ -40,8 +41,8 @@
   --secondary-bg-dark-900: #080c0f;
 
   /* Secondary Background - Light Theme */
-  --secondary-bg-light: #f3f4f6;
-  --secondary-bg-light-50: #fcfcfc;
+  --secondary-bg-light: #ffffe5;
+  --secondary-bg-light-50: #fffff8;
   --secondary-bg-light-900: #575859;
 
   /* Secondary Text - Dark Theme */
@@ -86,12 +87,12 @@
   --accent-red-light-900: #5c2623;
 
   /* Primary Purple - Light Theme */
-  --primary-light-main: #7c3aed;
-  --primary-light-50: #dac8fa;
-  --primary-light-900: #2d1555;
-  --primary-light-alt: #e9d5ff;
-  --primary-light-alt-50: #f9f3ff;
-  --primary-light-alt-900: #544d5c;
+  --primary-light-purple-main: #7c3aed;
+  --primary-light-purple-50: #dac8fa;
+  --primary-light-purple-900: #2d1555;
+  --primary-light-purple-alt: #e9d5ff;
+  --primary-light-purple-alt-50: #f9f3ff;
+  --primary-light-purple-alt-900: #544d5c;
 }
 
 /* Light theme semantic color variables */
@@ -99,7 +100,7 @@
 .light-theme {
   --color-background: var(--secondary-bg-light);
   --color-background-soft: var(--secondary-bg-light-50);
-  --color-background-mute: var(--primary-light-base);
+  --color-background-mute: var(--primary-light-50);
 
   --color-border: var(--divider-50);
   --color-border-hover: var(--divider-base);

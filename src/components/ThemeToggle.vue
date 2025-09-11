@@ -75,7 +75,7 @@ function getNextThemeLabel() {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: var(--color-background-soft);
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   color: var(--color-text);
