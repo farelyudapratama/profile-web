@@ -23,7 +23,7 @@ html.is-transitioning {
 /* Custom theme color palette */
 :root {
   /* Primary Purple - Dark Theme */
-  --primary-dark-main: #9333ea;
+  --primary-dark-main: #c533ea;
   --primary-dark-50: #f3e8ff;
   --primary-dark-900: #351254;
   --primary-dark-base: #6b21a8;
@@ -46,14 +46,14 @@ html.is-transitioning {
   --secondary-bg-light-900: #575859;
 
   /* Secondary Text - Dark Theme */
-  --secondary-text-dark: #d1d5db;
+  --secondary-text-dark: #4b4d4f;
   --secondary-text-dark-50: #f2f3f5;
-  --secondary-text-dark-900: #4b4d4f;
+  --secondary-text-dark-900: #f1f1f1;
 
   /* Secondary Text - Light Theme */
   --secondary-text-light: #e5e7eb;
   --secondary-text-light-50: #f8f8f9;
-  --secondary-text-light-900: #525355;
+  --secondary-text-light-900: #313235;
 
   /* Divider */
   --divider-base: #374151;
@@ -87,7 +87,7 @@ html.is-transitioning {
   --accent-red-light-900: #5c2623;
 
   /* Primary Purple - Light Theme */
-  --primary-light-purple-main: #7c3aed;
+  --primary-light-main: #4607b3;
   --primary-light-purple-50: #dac8fa;
   --primary-light-purple-900: #2d1555;
   --primary-light-purple-alt: #e9d5ff;
@@ -126,7 +126,7 @@ html.is-transitioning {
   --color-border-hover: var(--divider-50);
 
   --color-heading: var(--primary-dark-main);
-  --color-text: var(--secondary-text-dark);
+  --color-text: var(--secondary-text-dark-900);
 
   --color-primary: var(--primary-dark-main);
   --color-accent-blue: var(--accent-blue-dark);
