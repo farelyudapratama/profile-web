@@ -3,16 +3,17 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { onMounted, nextTick, computed, ref } from 'vue'
 import { useThemeStore } from './stores/theme'
 import ThemeToggle from './components/ThemeToggle.vue'
+import { House } from 'lucide-vue-next'
 
 const themeStore = useThemeStore()
 const route = useRoute()
 
 // Navigation items
 const navItems = ref([
-  { name: 'Home', path: '/', icon: 'fas fa-home' },
-  { name: 'Project', path: '/projects', icon: 'fas fa-project-diagram' },
-  { name: 'About', path: '/about', icon: 'fas fa-user' },
-  { name: 'Contact', path: '/contact', icon: 'fas fa-envelope' },
+  { name: 'Home', path: '/', icon: House },
+  { name: 'Project', path: '/projects', icon: House },
+  { name: 'About', path: '/about', icon: House },
+  { name: 'Contact', path: '/#contact', icon: House },
 ])
 // Computed property to determine if a nav item is active
 const isActive = (path: string): boolean => {
@@ -42,6 +43,9 @@ onMounted(async () => {
       </div>
     </div>
 
+    <!-- Divider -->
+    <div class="divider"></div>
+
     <!-- Navigation Links -->
     <div class="nav-links">
       <RouterLink
@@ -50,7 +54,7 @@ onMounted(async () => {
         :to="item.path"
         :class="['nav-item', { active: isActive(item.path) }]"
       >
-        <i :class="item.icon"></i>
+        <component :is="item.icon" />
         <span>{{ item.name }}</span>
       </RouterLink>
     </div>
@@ -65,7 +69,7 @@ onMounted(async () => {
 <style scoped>
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: var(--color-background);
   color: var(--color-text);
@@ -75,12 +79,14 @@ onMounted(async () => {
   z-index: 50;
   border-bottom: 1px solid var(--color-border);
   transition: all 0.3s ease;
+  max-height: 4.5rem;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  margin-right: 1rem;
 }
 
 .logo-img {
@@ -102,10 +108,16 @@ onMounted(async () => {
   transition: color 0.3s ease;
 }
 
+.divider {
+  height: 3rem;
+  width: 2px;
+  margin-right: 20px;
+}
+
 .nav-links {
   display: flex;
   gap: 1.5rem;
-  margin-right: 1rem;
+  margin-right: auto;
 }
 
 .nav-item {

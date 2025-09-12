@@ -334,9 +334,7 @@ body {
 
 /* Divider */
 .divider {
-  height: 1px;
   background-color: var(--color-border);
-  margin: 1.5rem 0;
 }
 
 /* Theme transition classes */
