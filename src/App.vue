@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import { onMounted, nextTick, computed, ref } from 'vue'
+import { onMounted, nextTick, watch, ref } from 'vue'
 import { useThemeStore } from './stores/theme'
 import ThemeToggle from './components/ThemeToggle.vue'
 import { House } from 'lucide-vue-next'
+import { gsap } from 'gsap'
 
 const themeStore = useThemeStore()
 const route = useRoute()
+
+const bubbles = ref(400) // jumlah bubble
+const showIntro = ref(true) // state overlay intro
 
 // Navigation items
 const navItems = ref([
@@ -23,16 +27,76 @@ const isActive = (path: string): boolean => {
   return route.path.startsWith(path)
 }
 
+watch(
+  showIntro,
+  (newValue) => {
+    if (newValue) {
+      // Disable scroll dan paksa scroll ke top
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.top = '0'
+      document.body.style.left = '0'
+      document.body.style.right = '0'
+      window.scrollTo(0, 0)
+    } else {
+      // Enable scroll kembali
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+    }
+  },
+  { immediate: true },
+)
+
 onMounted(async () => {
   await nextTick()
 
   themeStore.initTheme()
 
   themeStore.applyTheme()
+  const tl = gsap.timeline({
+    onComplete: () => {
+      showIntro.value = false
+    },
+  })
+
+  tl.to('.bubble', {
+    y: () => gsap.utils.random(-200, -600),
+    x: () => gsap.utils.random(-200, 200),
+    scale: () => gsap.utils.random(0.5, 1.5),
+    opacity: 0,
+    duration: () => gsap.utils.random(2, 4),
+    stagger: {
+      each: 0.05, // jarak antar animasi
+      amount: 1.5, // total waktu distribusi animasi
+      from: 'random', // acak urutan bubble
+    },
+    ease: 'power2.out',
+    onComplete: function () {
+      ;(this.targets() as HTMLElement[]).forEach((el) => el.remove())
+    },
+  })
 })
 </script>
 
 <template>
+  <div v-if="showIntro" class="bubble-overlay">
+    <span
+      v-for="n in bubbles"
+      :key="n"
+      class="bubble"
+      :style="{
+        top: `${Math.random() * 120 + -10}vh`,
+        left: `${Math.random() * 120 + -10}vw`,
+        width: `200px`,
+        height: `200px`,
+        background: `rgba(173,216,230,${Math.random() * 0.5 + 0.5})`,
+      }"
+    ></span>
+  </div>
+
   <nav class="navbar">
     <!--Logo & Tittle  -->
     <div class="logo">
@@ -67,6 +131,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* Bubble */
+.bubble-overlay {
+  width: 100vw;
+  height: 100vh;
+  cursor: wait;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
 .navbar {
   display: flex;
   justify-content: flex-start;
