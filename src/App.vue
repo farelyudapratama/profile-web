@@ -3,102 +3,154 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { onMounted, nextTick, watch, ref } from 'vue'
 import { useThemeStore } from './stores/theme'
 import ThemeToggle from './components/ThemeToggle.vue'
-import { House } from 'lucide-vue-next'
+import { House, FolderKanban, User, Blocks } from 'lucide-vue-next'
 import { gsap } from 'gsap'
 
 const themeStore = useThemeStore()
 const route = useRoute()
 
-const bubbles = ref(400) // jumlah bubble
-const showIntro = ref(true) // state overlay intro
+// DIUBAH: Jumlah bubble ditingkatkan agar lebih padat
+const totalBubbles = ref(400)
+const showIntro = ref(true)
 
-// Navigation items
+// Navigation items (tidak berubah)
 const navItems = ref([
   { name: 'Home', path: '/', icon: House },
-  { name: 'Project', path: '/projects', icon: House },
-  { name: 'About', path: '/about', icon: House },
-  { name: 'Contact', path: '/#contact', icon: House },
+  { name: 'Project', path: '/projects', icon: FolderKanban },
+  { name: 'About', path: '/about', icon: User },
+  {
+    name: 'Extra',
+    icon: Blocks,
+    children: [
+      { name: 'Blog', path: '/#blog', icon: Blocks },
+      { name: 'Guestbook', path: '/#guestbook', icon: Blocks },
+    ],
+  },
 ])
-// Computed property to determine if a nav item is active
+
+// Fungsi isActive (tidak berubah)
 const isActive = (path: string): boolean => {
   if (path === '/') {
     return route.path === '/'
   }
+  if (path.includes('#')) {
+    return route.hash === path.substring(path.indexOf('#'))
+  }
   return route.path.startsWith(path)
 }
 
+// Distribusi gelembung
+const getBubbleClass = (index: number): string => {
+  const percentage = index / totalBubbles.value
+  if (percentage < 0.15) {
+    return 'wave-1'
+  } else if (percentage < 0.5) {
+    return 'wave-2'
+  } else {
+    return 'wave-3'
+  }
+}
+
+// Watcher untuk scroll (tidak berubah)
 watch(
   showIntro,
   (newValue) => {
     if (newValue) {
-      // Disable scroll dan paksa scroll ke top
       document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.top = '0'
-      document.body.style.left = '0'
-      document.body.style.right = '0'
       window.scrollTo(0, 0)
     } else {
-      // Enable scroll kembali
       document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.left = ''
-      document.body.style.right = ''
     }
   },
   { immediate: true },
 )
 
+// Lifecycle hook onMounted
 onMounted(async () => {
   await nextTick()
-
   themeStore.initTheme()
-
   themeStore.applyTheme()
+
+  gsap.set('.bubble', {
+    y: '100vh',
+    opacity: 0,
+    scale: () => gsap.utils.random(0.5, 1.5),
+    x: () => gsap.utils.random(0, window.innerWidth),
+  })
+
   const tl = gsap.timeline({
     onComplete: () => {
       showIntro.value = false
     },
   })
 
-  tl.to('.bubble', {
-    y: () => gsap.utils.random(-200, -600),
-    x: () => gsap.utils.random(-200, 200),
-    scale: () => gsap.utils.random(0.5, 1.5),
-    opacity: 0,
-    duration: () => gsap.utils.random(2, 4),
-    stagger: {
-      each: 0.05, // jarak antar animasi
-      amount: 1.5, // total waktu distribusi animasi
-      from: 'random', // acak urutan bubble
+  // Gelembung Wave 1: Lebih cepat
+  tl.to(
+    '.wave-1',
+    {
+      y: `-=${window.innerHeight * 1.5}`,
+      opacity: () => gsap.utils.random(0.3, 0.8),
+      duration: 2,
+      ease: 'power1.out',
+      stagger: {
+        each: 0.05,
+        from: 'random',
+      },
     },
-    ease: 'power2.out',
-    onComplete: function () {
-      ;(this.targets() as HTMLElement[]).forEach((el) => el.remove())
+    'start',
+  )
+
+  // Gelembung Wave 2: Lebih cepat dan lebih rapat
+  tl.to(
+    '.wave-2',
+    {
+      y: `-=${window.innerHeight * 1.5}`,
+      opacity: () => gsap.utils.random(0.3, 0.8),
+      duration: 2.5,
+      ease: 'power2.out',
+      stagger: {
+        each: 0.025,
+        from: 'random',
+      },
     },
-  })
+    'start+=0.4',
+  )
+
+  // Gelembung Wave 3: Paling cepat dan paling rapat
+  tl.to(
+    '.wave-3',
+    {
+      y: `-=${window.innerHeight * 1.5}`,
+      opacity: () => gsap.utils.random(0.3, 0.8),
+      duration: 3,
+      ease: 'power3.out',
+      stagger: {
+        each: 0.01,
+        from: 'random',
+      },
+    },
+    'start+=0.8',
+  )
 })
 </script>
 
 <template>
   <div v-if="showIntro" class="bubble-overlay">
-    <span
-      v-for="n in bubbles"
+    <img
+      v-for="n in totalBubbles"
       :key="n"
+      src="/img/bubble.webp"
+      alt="bubble"
       class="bubble"
+      :class="getBubbleClass(n)"
       :style="{
-        top: `${Math.random() * 120 + -10}vh`,
-        left: `${Math.random() * 120 + -10}vw`,
-        width: `200px`,
-        height: `200px`,
-        background: `rgba(173,216,230,${Math.random() * 0.5 + 0.5})`,
+        width: `${Math.random() * 120 + 60}px`,
+        height: 'auto',
       }"
-    ></span>
+    />
   </div>
 
   <nav class="navbar">
-    <!--Logo & Tittle  -->
     <div class="logo">
       <img src="/img/android-chrome-192x192.png" alt="Logo" class="logo-img" />
       <div>
@@ -107,23 +159,36 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Divider -->
     <div class="divider"></div>
 
-    <!-- Navigation Links -->
     <div class="nav-links">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.name"
-        :to="item.path"
-        :class="['nav-item', { active: isActive(item.path) }]"
-      >
-        <component :is="item.icon" />
-        <span>{{ item.name }}</span>
-      </RouterLink>
+      <div v-for="item in navItems" :key="item.name" class="nav-item-wrapper">
+        <!-- kalau ada children → dropdown -->
+        <div v-if="item.children" class="dropdown">
+          <button class="nav-item dropdown-toggle">
+            <component :is="item.icon" />
+            <span>{{ item.name }}</span>
+          </button>
+          <div class="dropdown-menu">
+            <RouterLink
+              v-for="child in item.children"
+              :key="child.name"
+              :to="child.path"
+              class="dropdown-item"
+            >
+              {{ child.name }}
+            </RouterLink>
+          </div>
+        </div>
+
+        <!-- kalau ga ada children → normal link -->
+        <RouterLink v-else :to="item.path" :class="['nav-item', { active: isActive(item.path) }]">
+          <component :is="item.icon" />
+          <span>{{ item.name }}</span>
+        </RouterLink>
+      </div>
     </div>
 
-    <!-- Theme Toggle -->
     <ThemeToggle />
   </nav>
 
@@ -136,7 +201,7 @@ onMounted(async () => {
   width: 100vw;
   height: 100vh;
   cursor: wait;
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   z-index: 9999;
@@ -144,10 +209,57 @@ onMounted(async () => {
 
 .bubble {
   position: absolute;
+  top: 0;
+  left: 0;
   border-radius: 50%;
   will-change: transform, opacity;
 }
+.nav-item-wrapper {
+  position: relative;
+}
 
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  min-width: 150px;
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: flex;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.dropdown-item:hover {
+  background: var(--color-background-soft);
+  color: var(--color-primary);
+}
+
+/* Navbar */
 .navbar {
   display: flex;
   justify-content: flex-start;
@@ -192,6 +304,7 @@ onMounted(async () => {
 .divider {
   height: 3rem;
   width: 2px;
+  background-color: var(--color-border); /* Memberi warna pada divider */
   margin-right: 20px;
 }
 
