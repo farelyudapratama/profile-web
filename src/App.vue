@@ -3,17 +3,15 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { onMounted, nextTick, watch, ref } from 'vue'
 import { useThemeStore } from './stores/theme'
 import ThemeToggle from './components/ThemeToggle.vue'
-import { House, FolderKanban, User, Blocks } from 'lucide-vue-next'
+import { House, FolderKanban, User, Blocks, ChevronDown } from 'lucide-vue-next'
 import { gsap } from 'gsap'
 
 const themeStore = useThemeStore()
 const route = useRoute()
 
-// DIUBAH: Jumlah bubble ditingkatkan agar lebih padat
 const totalBubbles = ref(400)
 const showIntro = ref(true)
 
-// Navigation items (tidak berubah)
 const navItems = ref([
   { name: 'Home', path: '/', icon: House },
   { name: 'Project', path: '/projects', icon: FolderKanban },
@@ -28,7 +26,6 @@ const navItems = ref([
   },
 ])
 
-// Fungsi isActive (tidak berubah)
 const isActive = (path: string): boolean => {
   if (path === '/') {
     return route.path === '/'
@@ -37,6 +34,23 @@ const isActive = (path: string): boolean => {
     return route.hash === path.substring(path.indexOf('#'))
   }
   return route.path.startsWith(path)
+}
+
+const isChildActive = (children: any[]): boolean => {
+  return children.some((child) => isActive(child.path))
+}
+
+const openDropdown = ref<string | null>(null)
+
+const toggleDropdown = (name: string) => {
+  openDropdown.value = openDropdown.value === name ? null : name
+}
+
+// Close dropdown when clicking outside
+const closeDropdowns = (event: MouseEvent) => {
+  if (openDropdown.value && !(event.target as Element).closest('.dropdown')) {
+    openDropdown.value = null
+  }
 }
 
 // Distribusi gelembung
@@ -70,6 +84,9 @@ onMounted(async () => {
   await nextTick()
   themeStore.initTheme()
   themeStore.applyTheme()
+
+  // Add event listener for closing dropdowns when clicking outside
+  document.addEventListener('click', closeDropdowns)
 
   gsap.set('.bubble', {
     y: '100vh',
@@ -135,6 +152,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  /
   <div v-if="showIntro" class="bubble-overlay">
     <img
       v-for="n in totalBubbles"
@@ -163,25 +181,29 @@ onMounted(async () => {
 
     <div class="nav-links">
       <div v-for="item in navItems" :key="item.name" class="nav-item-wrapper">
-        <!-- kalau ada children → dropdown -->
         <div v-if="item.children" class="dropdown">
-          <button class="nav-item dropdown-toggle">
+          <button
+            class="nav-item dropdown-toggle"
+            :class="{ active: isChildActive(item.children) }"
+            @click="toggleDropdown(item.name)"
+          >
             <component :is="item.icon" />
             <span>{{ item.name }}</span>
+            <ChevronDown class="dropdown-arrow" :class="{ rotated: openDropdown === item.name }" />
           </button>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu" :class="{ show: openDropdown === item.name }">
             <RouterLink
               v-for="child in item.children"
               :key="child.name"
               :to="child.path"
               class="dropdown-item"
+              :class="{ active: isActive(child.path) }"
             >
               {{ child.name }}
             </RouterLink>
           </div>
         </div>
 
-        <!-- kalau ga ada children → normal link -->
         <RouterLink v-else :to="item.path" :class="['nav-item', { active: isActive(item.path) }]">
           <component :is="item.icon" />
           <span>{{ item.name }}</span>
@@ -233,18 +255,18 @@ onMounted(async () => {
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: 57px;
   left: 0;
   background: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: 0.375rem;
   min-width: 150px;
   display: none;
   flex-direction: column;
   z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.dropdown:hover .dropdown-menu {
+.dropdown-menu.show {
   display: flex;
 }
 
@@ -257,6 +279,38 @@ onMounted(async () => {
 .dropdown-item:hover {
   background: var(--color-background-soft);
   color: var(--color-primary);
+}
+
+.dropdown-item.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.dropdown-toggle.active {
+  color: var(--color-primary);
+  font-weight: 600;
+  position: relative;
+}
+
+.dropdown-toggle.active::after {
+  content: '';
+  position: absolute;
+  bottom: -0.25rem;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+}
+.dropdown-arrow {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.25rem;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
 }
 
 /* Navbar */
