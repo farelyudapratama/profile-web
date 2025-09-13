@@ -152,7 +152,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  /
   <div v-if="showIntro" class="bubble-overlay">
     <img
       v-for="n in totalBubbles"
