@@ -47,12 +47,12 @@ html.is-transitioning {
 
   /* Secondary Text - Dark Theme */
   --secondary-text-dark: #4b4d4f;
-  --secondary-text-dark-50: #f2f3f5;
+  --secondary-text-dark-50: #b3a2b8;
   --secondary-text-dark-900: #f1f1f1;
 
   /* Secondary Text - Light Theme */
-  --secondary-text-light: #e5e7eb;
-  --secondary-text-light-50: #f8f8f9;
+  --secondary-text-light: #b7b8a7;
+  --secondary-text-light-50: #636656;
   --secondary-text-light-900: #313235;
 
   /* Divider */
@@ -61,7 +61,7 @@ html.is-transitioning {
   --divider-900: #14171d;
 
   /* Accent Colors - Dark Theme */
-  --accent-blue-dark: #22d3ee;
+  --accent-blue-dark: #5ee9ff;
   --accent-blue-dark-50: #c1f3fa;
   --accent-blue-dark-900: #0c4c56;
 
@@ -74,7 +74,7 @@ html.is-transitioning {
   --accent-red-dark-900: #561818;
 
   /* Accent Colors - Light Theme */
-  --accent-blue-light: #67e6dd;
+  --accent-blue-light: #002395;
   --accent-blue-light-50: #c8f8f5;
   --accent-blue-light-900: #253530;
 
@@ -107,6 +107,8 @@ html.is-transitioning {
 
   --color-heading: var(--primary-light-main);
   --color-text: var(--secondary-text-light-900);
+  --color-text-secondary: var(--secondary-text-light-50);
+  --color-text-muted: var(--secondary-text-light);
 
   --color-primary: var(--primary-light-main);
   --color-accent-blue: var(--accent-blue-light);
@@ -127,6 +129,8 @@ html.is-transitioning {
 
   --color-heading: var(--primary-dark-main);
   --color-text: var(--secondary-text-dark-900);
+  --color-text-secondary: var(--secondary-text-dark-50);
+  --color-text-muted: var(--secondary-text-dark);
 
   --color-primary: var(--primary-dark-main);
   --color-accent-blue: var(--accent-blue-dark);
@@ -343,4 +347,21 @@ body {
     background-color 0.3s ease,
     color 0.3s ease,
     border-color 0.3s ease;
+}
+
+/* Scrollbar container */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-heading);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text);
 }

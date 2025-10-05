@@ -3,14 +3,14 @@ import { ref, onMounted, nextTick } from 'vue'
 import { RouterView } from 'vue-router'
 import { useThemeStore } from './stores/theme'
 import NavBar from './components/NavBar.vue'
-import IntroAnimation from './components/IntroAnimation.vue'
+// import IntroAnimation from './components/IntroAnimation.vue'
 
 const themeStore = useThemeStore()
-const showIntro = ref(themeStore.isDark)
+// const showIntro = ref(themeStore.isDark)
 
-const handleAnimationComplete = () => {
-  showIntro.value = false
-}
+// const handleAnimationComplete = () => {
+//   showIntro.value = false
+// }
 
 onMounted(async () => {
   await nextTick()
@@ -20,7 +20,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IntroAnimation :show="showIntro" @animation-complete="handleAnimationComplete" />
+  <!-- <IntroAnimation :show="showIntro" @animation-complete="handleAnimationComplete" /> -->
   <NavBar />
   <RouterView />
 </template>
