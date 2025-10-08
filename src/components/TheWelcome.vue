@@ -1,24 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useLanguageStore } from '@/stores/language'
 
 const languageStore = useLanguageStore()
 
 const messages = {
   id: {
-    welcome: 'Selamat Datang!',
+    welcome: 'Yo, Aku Farel!',
     intro: '"Satu baris kode untuk mengontrol semuanya… atau setidaknya bikin crash semuanya."',
     description:
-      'Saya seorang Software Engineer yang bersemangat dalam menciptakan solusi teknologi yang inovatif.',
-    explore: 'Jelajahi lebih lanjut untuk mengetahui tentang proyek dan pengalaman saya.',
+      'Aku ingin menjadi software engineer yang menikmati proses belajar. Aku tahu jalan ini panjang, penuh tantangan, tapi justru di situlah serunya. Setiap proyek kecil, setiap ide, dan setiap percobaan adalah bagian dari perjalanan itu.',
   },
   en: {
-    welcome: 'Welcome!',
+    welcome: 'Hi, I’m Farel!',
     intro: '"One line of code to rule them all… or at least crash them all."',
     description:
-      'I am a Software Engineer passionate about creating innovative technology solutions.',
-    explore: 'Explore further to learn about my projects and experiences.',
+      'I aspire to become a software engineer who truly enjoys the journey of learning. The road may be long and challenging, but that’s exactly what makes it meaningful. Every small project, idea, and experiment is a step forward in that journey.',
   },
 }
+
+const descriptionLines = computed(() => {
+  const desc = messages[languageStore.currentLang].description
+  // Pisahkan berdasarkan titik diikuti spasi, lalu filter jika kosong
+  return desc
+    .split('. ')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+})
 </script>
 
 <template>
@@ -31,10 +39,9 @@ const messages = {
         {{ messages[languageStore.currentLang].intro }}
       </blockquote>
       <p class="description">
-        {{ messages[languageStore.currentLang].description }}
-      </p>
-      <p class="explore">
-        {{ messages[languageStore.currentLang].explore }}
+        <span v-for="(line, idx) in descriptionLines" :key="idx">
+          {{ line }}<span v-if="idx !== descriptionLines.length - 1"><br /></span>
+        </span>
       </p>
     </div>
     <div class="welcome-image">
@@ -45,7 +52,7 @@ const messages = {
 
 <style scoped>
 .welcome-section {
-  max-width: 900px;
+  max-width: 1660px;
   min-height: 100vh;
   margin: 0 auto;
   padding: 3rem 2rem;
@@ -65,14 +72,15 @@ const messages = {
 }
 
 .welcome-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
+  font-family: 'Nunito', sans-serif;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .intro-quote {
-  font-size: 1.25rem;
+  font-size: 2rem;
   font-style: italic;
   color: var(--color-text-secondary);
   margin: 0 0 0.5rem 0;
@@ -81,15 +89,8 @@ const messages = {
 }
 
 .description {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   color: var(--color-text);
-}
-
-.explore {
-  font-size: 1.05rem;
-  color: var(--color-accent-bluec);
-  font-weight: 500;
-  margin-top: 0.5rem;
 }
 
 .welcome-image {
@@ -97,16 +98,22 @@ const messages = {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 200px;
 }
 
 .profile-img {
   width: 100%;
-  max-width: 320px;
-  max-height: 400px;
-  border-radius: 1.5rem;
+  max-width: 640px;
+  max-height: 800px;
+  border-radius: 2.5rem;
   box-shadow: 0 4px 24px rgba(66, 153, 225, 0.13);
   object-fit: cover;
-  background: #fff;
+  background: radial-gradient(
+    circle,
+    rgb(255, 255, 255) 29%,
+    rgb(241, 241, 241) 50%,
+    var(--color-background) 100%
+  );
 }
 
 @media (max-width: 900px) {

@@ -88,7 +88,13 @@ onUnmounted(() => {
 <template>
   <nav class="navbar">
     <div class="logo">
-      <img src="/img/android-chrome-192x192.png" alt="Logo" class="logo-img" />
+      <img
+        src="/img/android-chrome-192x192.png"
+        alt="Logo"
+        class="logo-img"
+        width="72"
+        height="72"
+      />
       <div class="logo-text">
         <h1 class="name">Farel Yuda Pratama</h1>
         <p class="subtitle">Aspiring Software Engineer</p>
@@ -240,8 +246,9 @@ onUnmounted(() => {
 }
 
 .name {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.7rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
   margin: 0;
   color: var(--color-heading);
   transition: color 0.3s ease;

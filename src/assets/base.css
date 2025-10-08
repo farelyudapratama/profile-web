@@ -23,7 +23,7 @@ html.is-transitioning {
 /* Custom theme color palette */
 :root {
   /* Primary Purple - Dark Theme */
-  --primary-dark-main: #c533ea;
+  --primary-dark-main: #f652ff;
   --primary-dark-50: #f3e8ff;
   --primary-dark-900: #351254;
   --primary-dark-base: #6b21a8;
@@ -156,6 +156,7 @@ body {
     background-color 0.5s;
   line-height: 1.6;
   font-family:
+    'Tsukimi Rounded',
     Inter,
     -apple-system,
     BlinkMacSystemFont,
