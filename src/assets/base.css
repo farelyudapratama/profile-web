@@ -148,6 +148,7 @@ html.is-transitioning {
   font-weight: normal;
 }
 
+html,
 body {
   color: var(--color-text);
   background: var(--color-background);

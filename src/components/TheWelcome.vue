@@ -82,6 +82,7 @@ const descriptionLines = computed(() => {
 .intro-quote {
   font-size: 2rem;
   font-style: italic;
+  font-weight: 500;
   color: var(--color-text-secondary);
   margin: 0 0 0.5rem 0;
   border-left: 4px solid var(--color-primary);
@@ -105,12 +106,12 @@ const descriptionLines = computed(() => {
   width: 100%;
   max-width: 640px;
   max-height: 800px;
-  border-radius: 2.5rem;
+  border-radius: 50%;
   box-shadow: 0 4px 24px rgba(66, 153, 225, 0.13);
   object-fit: cover;
   background: radial-gradient(
     circle,
-    rgb(255, 255, 255) 29%,
+    rgb(255, 255, 255) 45%,
     rgb(241, 241, 241) 50%,
     var(--color-background) 100%
   );

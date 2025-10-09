@@ -295,7 +295,7 @@ onUnmounted(() => {
 }
 
 .lang-text {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
@@ -342,6 +342,7 @@ onUnmounted(() => {
 
 .dropdown-item {
   padding: 0.5rem 1rem;
+  font-weight: 500;
   text-decoration: none;
   color: var(--color-text);
 }
@@ -354,12 +355,12 @@ onUnmounted(() => {
 
 .dropdown-item.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .dropdown-toggle.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: 700;
   position: relative;
 }
 
@@ -396,12 +397,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   font-size: 1rem;
-  font-weight: 500;
   color: var(--color-text);
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
   transition: all 0.2s ease;
+}
+
+.nav-item span {
+  font-weight: 700;
 }
 
 .nav-item:hover {
@@ -412,7 +416,6 @@ onUnmounted(() => {
 
 .nav-item.active {
   color: var(--color-primary);
-  font-weight: 600;
   position: relative;
 }
 
