@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, onBeforeUnmount, computed } from 'vue'
 import gsap from 'gsap'
+import { MoveRight } from 'lucide-vue-next'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
 
 type Project = ProjectType
@@ -166,7 +167,9 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
     </div>
 
     <div class="more">
-      <a href="#/projects" class="btn btn-primary">See all projects</a>
+      <a href="#/projects" class="btn btn-primary"
+        >See all projects <MoveRight class="arrow-right"
+      /></a>
     </div>
 
     <!-- custom context menu -->
@@ -324,6 +327,14 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   font-size: large;
   font-weight: 700;
   border-radius: 0%;
+}
+
+.arrow-right {
+  transition: transform 0.3s ease-out;
+}
+
+.btn-primary:hover .arrow-right {
+  transform: rotate(-45deg);
 }
 
 /* context menu */
