@@ -246,7 +246,14 @@ body {
   border: 2px solid var(--color-border);
   color: var(--color-text);
   background: transparent;
-  transition: color 0.3s ease;
+  text-decoration: none;
+  padding: 0.6em 1.2em;
+  border-radius: 6px;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.3s ease;
+  z-index: 0;
 }
 
 .btn-primary::before {
@@ -306,7 +313,6 @@ body {
 
 .card:hover {
   border-color: var(--color-border-hover);
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 

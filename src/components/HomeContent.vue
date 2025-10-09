@@ -215,7 +215,6 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   padding: 3rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
   justify-content: center;
   border-radius: 2rem;
   text-align: center;
@@ -231,11 +230,11 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 .home-content p {
   font-size: 1.25rem;
   color: var(--color-text-secondary);
+  margin-bottom: 2rem;
 }
 
 .grid {
   display: grid;
-  gap: 1.25rem;
   grid-template-columns: repeat(2, minmax(280px, 1fr));
   justify-items: center;
 }
@@ -245,7 +244,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   flex-direction: column;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 40%);
   border: 1px solid var(--color-border);
-  border-radius: 1rem;
+  border-radius: 0%;
   overflow: hidden;
   will-change: transform;
   transition: box-shadow 0.25s ease;
@@ -299,7 +298,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 
 .tech-badge {
   color: var(--color-text);
-  border-radius: 999px;
+  border-radius: 0%;
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
   border: 1px solid var(--color-border);
@@ -314,14 +313,17 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 .actions .btn {
   font-weight: 600;
   flex: 1;
+  border-radius: 0%;
   justify-content: center;
 }
 
 .more .btn {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  text-align: center;
+  justify-content: center;
+  font-size: large;
+  font-weight: 700;
+  border-radius: 0%;
 }
 
 /* context menu */
