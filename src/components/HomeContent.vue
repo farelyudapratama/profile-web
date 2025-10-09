@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
+import { ref, onMounted, nextTick, onBeforeUnmount, computed } from 'vue'
 import gsap from 'gsap'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
 
@@ -11,6 +11,12 @@ const grid = ref<HTMLElement | null>(null)
 const context = ref({ visible: false, x: 0, y: 0, projectId: null as number | null })
 const modal = ref({ visible: false, src: '', title: '' })
 const listeners: Array<() => void> = []
+
+const selectedProject = computed(() => {
+  const id = context.value.projectId
+  if (id == null) return null
+  return projects.value.find((p) => p.id === id) ?? null
+})
 
 onMounted(async () => {
   await nextTick()
@@ -73,7 +79,10 @@ onBeforeUnmount(() => {
 
 function openGithubFor(projectId: number | null) {
   const p = projects.value.find((x) => x.id === projectId)
-  if (p && p.github) window.open(p.github, '_blank')
+  if (p && p.github) {
+    window.open(p.github, '_blank')
+  }
+  context.value.visible = false
 }
 
 function openImageFor(projectId: number | null) {
@@ -81,6 +90,20 @@ function openImageFor(projectId: number | null) {
   if (p) {
     modal.value = { visible: true, src: p.img, title: p.title }
   }
+  context.value.visible = false
+}
+
+function openLiveDemoFor(projectId: number | null) {
+  const p = projects.value.find((x) => x.id === projectId)
+  if (p && p.demo) {
+    window.open(p.demo, '_blank')
+  }
+  context.value.visible = false
+}
+
+function isDemo(demo?: string) {
+  if (!demo) return false
+  return /^https?:\/\//.test(demo) || demo.startsWith('/')
 }
 
 function closeModal() {
@@ -118,7 +141,6 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
       <article v-for="p in visibleProjects" :key="p.id" class="card project-card" :data-id="p.id">
         <div class="media">
           <img :src="p.img" :alt="p.title" />
-          <div class="badge">New-ish</div>
         </div>
 
         <div class="body">
@@ -130,15 +152,21 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
           </div>
 
           <div class="actions">
-            <a :href="p.link || '#'" class="btn btn-primary">View Project</a>
-            <a :href="p.link || '#/projects'" class="btn btn-outline">Details</a>
+            <template v-if="isDemo(p.demo)">
+              <a :href="p.demo" class="btn btn-primary" target="_blank" rel="noopener">Live Demo</a>
+            </template>
+            <template v-else-if="p.github">
+              <a :href="p.github" class="btn btn-primary" target="_blank" rel="noopener">GitHub</a>
+            </template>
+
+            <a :href="`/projects/${p.id}`" class="btn btn-primary">Details</a>
           </div>
         </div>
       </article>
     </div>
 
     <div class="more">
-      <a href="#/projects" class="btn btn-outline">See all projects</a>
+      <a href="#/projects" class="btn btn-primary">See all projects</a>
     </div>
 
     <!-- custom context menu -->
@@ -147,7 +175,24 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
       class="context-menu"
       :style="{ left: context.x + 'px', top: context.y + 'px' }"
     >
-      <button class="context-item" @click="openGithubFor(context.projectId)">Open GitHub</button>
+      <button
+        class="context-item"
+        :class="{ disabled: !selectedProject || !selectedProject.github }"
+        :aria-disabled="!selectedProject || !selectedProject.github"
+        @click="selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null"
+      >
+        Open GitHub
+      </button>
+
+      <button
+        class="context-item"
+        :class="{ disabled: !selectedProject || !selectedProject.demo }"
+        :aria-disabled="!selectedProject || !selectedProject.demo"
+        @click="selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null"
+      >
+        Open Live Demo
+      </button>
+
       <button class="context-item" @click="openImageFor(context.projectId)">Enlarge Image</button>
     </div>
 
@@ -224,17 +269,6 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   filter: saturate(1.05) contrast(1.02);
 }
 
-.badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-}
-
 .body {
   padding: 1rem;
   display: flex;
@@ -244,13 +278,16 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 }
 
 .title {
-  font-size: 1.125rem;
+  font-size: 1.75rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .desc {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -261,11 +298,10 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 }
 
 .tech-badge {
-  background: var(--color-background-soft);
   color: var(--color-text);
   border-radius: 999px;
   padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   border: 1px solid var(--color-border);
 }
 
@@ -276,15 +312,16 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 }
 
 .actions .btn {
+  font-weight: 600;
   flex: 1;
   justify-content: center;
 }
 
-.more {
+.more .btn {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-top: 0.5rem;
+  text-align: center;
 }
 
 /* context menu */
@@ -305,12 +342,18 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   border: none;
   padding: 0.45rem 0.75rem;
   color: var(--color-text);
+  font-size: 1.3rem;
   text-align: left;
   cursor: pointer;
   border-radius: 0.35rem;
 }
 .context-item:hover {
   background: var(--color-background-soft);
+}
+
+.context-item.disabled {
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 /* image modal overlay */

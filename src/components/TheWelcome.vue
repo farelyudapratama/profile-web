@@ -82,15 +82,16 @@ const descriptionLines = computed(() => {
 .intro-quote {
   font-size: 2rem;
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-secondary);
   margin: 0 0 0.5rem 0;
   border-left: 4px solid var(--color-primary);
   padding-left: 1rem;
 }
 
-.description {
+.description span {
   font-size: 1.5rem;
+  font-weight: 500;
   color: var(--color-text);
 }
 

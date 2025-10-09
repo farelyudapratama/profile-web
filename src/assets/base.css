@@ -88,11 +88,11 @@ html.is-transitioning {
 
   /* Primary Purple - Light Theme */
   --primary-light-main: #4607b3;
-  --primary-light-purple-50: #dac8fa;
+  --primary-light-purple-50: #ede9fe;
   --primary-light-purple-900: #2d1555;
-  --primary-light-purple-alt: #e9d5ff;
-  --primary-light-purple-alt-50: #f9f3ff;
-  --primary-light-purple-alt-900: #544d5c;
+  --primary-light-purple-alt: #6d28d9;
+  --primary-light-purple-alt-50: #f3e8ff;
+  --primary-light-purple-alt-900: #312e81;
 }
 
 /* Light theme semantic color variables */
@@ -241,13 +241,32 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  color: white;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  background: transparent;
+  transition: color 0.3s ease;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.4s ease;
+  z-index: -1;
+}
+
+.btn-primary:hover::before {
+  width: 100%;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  color: var(--color-background);
 }
 
 .btn-outline {

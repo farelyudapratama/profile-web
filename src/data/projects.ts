@@ -4,6 +4,7 @@ export type Project = {
   description: string
   img: string
   tech: string[]
+  demo?: string
   link?: string
   github?: string
   featured?: boolean
@@ -17,6 +18,7 @@ export const projects: Project[] = [
       'A tiny physics playground where bubbles argue about who is rounder. Built with canvas and forgiving UX.',
     img: '/public/img/bubble.webp',
     tech: ['Vue', 'TypeScript', 'Canvas'],
+    demo: 'https://snapcal-fastapi-1007513690873.asia-southeast2.run.app',
     link: '#/projects/1',
     github: 'https://github.com/USERNAME/bubble-pop',
     featured: true,
