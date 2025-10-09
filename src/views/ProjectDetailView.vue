@@ -17,7 +17,7 @@ if (!project) {
   <section class="project-detail" v-if="project">
     <h1>{{ project.title }}</h1>
     <div class="media">
-      <img :src="project.img" :alt="project.title" />
+      <img :src="project.img" :alt="project.title.en" />
     </div>
     <p>{{ project.description }}</p>
     <div class="tech">

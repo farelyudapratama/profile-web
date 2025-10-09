@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick, onBeforeUnmount, computed } from 'vue'
 import gsap from 'gsap'
 import { MoveRight } from 'lucide-vue-next'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
+import { useLanguageStore } from '@/stores/language'
 
 type Project = ProjectType
 
@@ -12,6 +13,23 @@ const grid = ref<HTMLElement | null>(null)
 const context = ref({ visible: false, x: 0, y: 0, projectId: null as number | null })
 const modal = ref({ visible: false, src: '', title: '' })
 const listeners: Array<() => void> = []
+
+const lang = useLanguageStore()
+const t = (key: string) => {
+  const strings: Record<string, Record<string, string>> = {
+    recent: { en: 'Recent Projects', id: 'Proyek Terbaru' },
+    subtitle: { en: 'The rest live on the Projects page.', id: 'Sisanya ada di halaman Projects.' },
+    seeAll: { en: 'See all projects', id: 'Lihat semua proyek' },
+    liveDemo: { en: 'Live Demo', id: 'Live Demo' },
+    github: { en: 'GitHub', id: 'GitHub' },
+    details: { en: 'Details', id: 'Detail' },
+    close: { en: 'Close', id: 'Tutup' },
+    openGithub: { en: 'Open GitHub', id: 'Buka GitHub' },
+    openLiveDemo: { en: 'Open Live Demo', id: 'Buka Demo' },
+    enlargeImage: { en: 'Enlarge Image', id: 'Perbesar Gambar' },
+  }
+  return strings[key] ? (strings[key][lang.currentLang] ?? strings[key].en) : key
+}
 
 const selectedProject = computed(() => {
   const id = context.value.projectId
@@ -89,7 +107,7 @@ function openGithubFor(projectId: number | null) {
 function openImageFor(projectId: number | null) {
   const p = projects.value.find((x) => x.id === projectId)
   if (p) {
-    modal.value = { visible: true, src: p.img, title: p.title }
+    modal.value = { visible: true, src: p.img, title: p.title[lang.currentLang] }
   }
   context.value.visible = false
 }
@@ -134,19 +152,19 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 <template>
   <section class="home-content">
     <div class="header">
-      <h2>Recent Projects</h2>
-      <p class="subtitle">The rest live on the Projects page.</p>
+      <h2>{{ t('recent') }}</h2>
+      <p class="subtitle">{{ t('subtitle') }}</p>
     </div>
 
     <div class="grid" ref="grid">
       <article v-for="p in visibleProjects" :key="p.id" class="card project-card" :data-id="p.id">
         <div class="media">
-          <img :src="p.img" :alt="p.title" />
+          <img :src="p.img" :alt="p.title[lang.currentLang]" />
         </div>
 
         <div class="body">
-          <h3 class="title">{{ p.title }}</h3>
-          <p class="desc">{{ p.description }}</p>
+          <h3 class="title">{{ p.title[lang.currentLang] }}</h3>
+          <p class="desc">{{ p.description[lang.currentLang] }}</p>
 
           <div class="tech">
             <span v-for="t in p.tech" :key="t" class="tech-badge">{{ t }}</span>
@@ -154,13 +172,17 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 
           <div class="actions">
             <template v-if="isDemo(p.demo)">
-              <a :href="p.demo" class="btn btn-primary" target="_blank" rel="noopener">Live Demo</a>
+              <a :href="p.demo" class="btn btn-primary" target="_blank" rel="noopener">{{
+                t('liveDemo')
+              }}</a>
             </template>
             <template v-else-if="p.github">
-              <a :href="p.github" class="btn btn-primary" target="_blank" rel="noopener">GitHub</a>
+              <a :href="p.github" class="btn btn-primary" target="_blank" rel="noopener">{{
+                t('github')
+              }}</a>
             </template>
 
-            <a :href="`/projects/${p.id}`" class="btn btn-primary">Details</a>
+            <a :href="`/projects/${p.id}`" class="btn btn-primary">{{ t('details') }}</a>
           </div>
         </div>
       </article>
@@ -168,7 +190,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 
     <div class="more">
       <a href="#/projects" class="btn btn-primary"
-        >See all projects <MoveRight class="arrow-right"
+        >{{ t('seeAll') }} <MoveRight class="arrow-right"
       /></a>
     </div>
 
@@ -184,7 +206,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
         :aria-disabled="!selectedProject || !selectedProject.github"
         @click="selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null"
       >
-        Open GitHub
+        {{ t('openGithub') }}
       </button>
 
       <button
@@ -193,10 +215,12 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
         :aria-disabled="!selectedProject || !selectedProject.demo"
         @click="selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null"
       >
-        Open Live Demo
+        {{ t('openLiveDemo') }}
       </button>
 
-      <button class="context-item" @click="openImageFor(context.projectId)">Enlarge Image</button>
+      <button class="context-item" @click="openImageFor(context.projectId)">
+        {{ t('enlargeImage') }}
+      </button>
     </div>
 
     <!-- image modal -->
@@ -204,7 +228,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
       <div class="modal-content">
         <img :src="modal.src" :alt="modal.title" />
         <p class="modal-title">{{ modal.title }}</p>
-        <button class="btn btn-outline" @click="closeModal">Close</button>
+        <button class="btn btn-outline" @click="closeModal">{{ t('close') }}</button>
       </div>
     </div>
   </section>
@@ -240,6 +264,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   display: grid;
   grid-template-columns: repeat(2, minmax(280px, 1fr));
   justify-items: center;
+  align-items: stretch;
 }
 
 .project-card {
@@ -251,6 +276,9 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   overflow: hidden;
   will-change: transform;
   transition: box-shadow 0.25s ease;
+  min-width: 100%;
+  min-height: 420px;
+  height: 100%;
 }
 .project-card:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
@@ -259,6 +287,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 .media {
   position: relative;
   height: 160px;
+  min-height: 160px;
   background: var(--color-background-mute);
   display: flex;
   align-items: center;
@@ -277,6 +306,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   flex-direction: column;
   gap: 0.75rem;
   min-height: 180px;
+  flex: 1 1 auto;
 }
 
 .title {
@@ -327,6 +357,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   font-size: large;
   font-weight: 700;
   border-radius: 0%;
+  border: 1px solid var(--color-border);
 }
 
 .arrow-right {
