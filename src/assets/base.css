@@ -115,7 +115,7 @@ html.is-transitioning {
   --color-accent-green: var(--accent-green-light);
   --color-accent-red: var(--accent-red-light);
 
-  --section-gap: 160px;
+  --color-background-dark: var(--secondary-bg-light-900);
 }
 
 /* Dark theme semantic color variables */
@@ -136,6 +136,8 @@ html.is-transitioning {
   --color-accent-blue: var(--accent-blue-dark);
   --color-accent-green: var(--accent-green-dark);
   --color-accent-red: var(--accent-red-dark);
+
+  --color-background-dark: var(--secondary-bg-dark-900);
 }
 
 /* No system preference mode - we only have light and dark themes */
@@ -366,6 +368,10 @@ body {
 /* Divider */
 .divider {
   background-color: var(--color-border);
+}
+
+a {
+  text-decoration: none;
 }
 
 /* Theme transition classes */

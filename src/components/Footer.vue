@@ -2,6 +2,27 @@
 defineOptions({
   name: 'AppFooter',
 })
+
+import { useLanguageStore } from '@/stores/language'
+
+const lang = useLanguageStore()
+const t = (key: string) => {
+  const strings: Record<string, Record<string, string>> = {
+    footerDesc: {
+      en: 'Wow, you made it to the footer! No bugs here (hopefully). Thanks for stopping by!',
+      id: 'Wow, kamu sampai di footer! Semoga tidak ada bug di sini. Terima kasih sudah mampir!',
+    },
+    contactMe: {
+      en: 'Feel free to contact me anytime, anywhere.',
+      id: 'Jangan ragu untuk menghubungi saya kapan saja, di mana saja.',
+    },
+    letsContact: {
+      en: "Let's Contact",
+      id: 'Hubungi aku',
+    },
+  }
+  return strings[key] ? (strings[key][lang.currentLang] ?? strings[key].en) : key
+}
 </script>
 
 <template>
@@ -11,16 +32,16 @@ defineOptions({
         <div class="footer-left">
           <span class="brand">FYP</span>
           <p class="footer-desc">
-            Wow, you made it to the footer! No bugs here (hopefully). Thanks for stopping by!
+            {{ t('footerDesc') }}
           </p>
           <div class="footer-socials">
             <a
-              href="mailto:farelyudapratama@gmail.com"
+              href="mailto:farelyudapratama51@gmail.com"
               title="Email"
               target="_blank"
               rel="noopener"
             >
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <svg width="30" height="30" fill="none" viewBox="0 0 24 24">
                 <path
                   stroke="currentColor"
                   stroke-width="1.5"
@@ -34,36 +55,42 @@ defineOptions({
               target="_blank"
               rel="noopener"
             >
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <svg width="30" height="30" fill="none" viewBox="0 0 24 24">
                 <path
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.091-.647.35-1.088.636-1.339-2.22-.253-4.555-1.112-4.555-4.951 0-1.093.39-1.987 1.029-2.687-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.203 2.397.1 2.65.64.7 1.028 1.594 1.028 2.687 0 3.848-2.338 4.695-4.566 4.944.359.309.678.919.678 1.852 0 1.336-.012 2.417-.012 2.747 0 .268.18.579.688.481C19.138 20.203 22 16.447 22 12.021 22 6.484 17.523 2 12 2Z"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  d="M12 1.545c-6.055 0-10.957 4.877-10.957 10.883c0 4.41 2.643 8.205 6.447 9.912c.398.179.787.108 1.091-.12a1.38 1.38 0 0 0 .532-1.107v-.57l-1.357-.184a.489.489 0 0 1-.03-.005c-.748-.146-1.253-.409-1.623-.788c-.311-.319-.501-.701-.662-1.025l-.056-.113a11.645 11.645 0 0 0-.487-.91c-.135-.214-.24-.324-.344-.393c-.264-.175-.518-.472-.518-.843a.72.72 0 0 1 .26-.56a.844.844 0 0 1 .546-.182c.222 0 .431.068.605.146c.178.08.355.186.52.296c.402.268.798.585 1.133.976c.349.406.596.664.968.717c.306.044.618.045.861.034a2.558 2.558 0 0 1 .166-.56a8.347 8.347 0 0 1-.877-.256c-.654-.232-1.383-.593-1.873-1.14c-.538-.602-.871-1.139-1.057-1.767c-.181-.612-.211-1.275-.211-2.091c0-1.25.541-2.303.947-2.862a8.655 8.655 0 0 1-.335-1.501a3.515 3.515 0 0 1 .001-.968c.05-.293.175-.653.504-.87c.317-.211.689-.202.979-.148c.301.057.614.182.902.325c.469.232.935.542 1.284.805c.602-.177 1.667-.405 2.63-.426h.022c.964.021 1.981.249 2.568.425c.35-.262.815-.573 1.283-.804c.288-.143.6-.268.902-.325c.29-.054.662-.063.98.147c.328.218.454.578.503.871c.051.305.039.646 0 .968a8.661 8.661 0 0 1-.334 1.501c.406.56.947 1.613.947 2.862c0 .816-.03 1.479-.21 2.09c-.187.63-.52 1.166-1.058 1.768c-.49.547-1.219.908-1.873 1.14a8.45 8.45 0 0 1-1.062.297c.123.372.167.673.167.846v3.09c0 .47.219.871.53 1.105c.302.229.69.3 1.088.126c3.84-1.692 6.514-5.497 6.514-9.93c0-6.005-4.9-10.882-10.956-10.882ZM9.476 18.71c-.26.037-.001 0-.001 0h-.003l-.008.002l-.029.004a6.523 6.523 0 0 1-.447.037a5.782 5.782 0 0 1-1.066-.043c-.791-.112-1.272-.672-1.583-1.036l-.03-.034a3.6 3.6 0 0 0-.327-.333c.103.19.21.402.325.63l.01.02l.051.104c.175.348.29.58.481.774c.186.19.476.374 1.062.49l1.794.243a.522.522 0 0 1 .452.518v1.027c0 .8-.375 1.513-.95 1.945a2.087 2.087 0 0 1-2.143.236C2.902 21.427 0 17.27 0 12.428C0 5.836 5.377.5 12 .5s12 5.336 12 11.928c0 4.867-2.939 9.035-7.137 10.886a2.09 2.09 0 0 1-2.137-.247a2.426 2.426 0 0 1-.946-1.942v-3.09c0-.07-.049-.474-.322-1.017a.524.524 0 0 1 .408-.755a7.187 7.187 0 0 0 1.504-.356c.594-.21 1.127-.498 1.444-.852c.471-.526.706-.93.835-1.367c.134-.453.168-.98.168-1.793c0-1.141-.6-2.1-.876-2.409a.523.523 0 0 1-.104-.523a7.82 7.82 0 0 0 .375-1.554c.032-.275.034-.505.006-.671a.457.457 0 0 0-.054-.173a.486.486 0 0 0-.207.009c-.17.032-.387.112-.633.234c-.49.242-1 .6-1.316.856a.52.52 0 0 1-.505.085A9.306 9.306 0 0 0 12 7.296c-1.007.024-2.169.31-2.566.453a.52.52 0 0 1-.505-.085a7.775 7.775 0 0 0-1.316-.856a2.607 2.607 0 0 0-.634-.234a.486.486 0 0 0-.206-.009a.456.456 0 0 0-.054.173c-.028.166-.026.396.006.671A7.89 7.89 0 0 0 7.1 8.963c.063.18.024.38-.104.523c-.276.309-.876 1.268-.876 2.409c0 .812.034 1.34.168 1.793c.13.437.364.84.834 1.367c.318.354.85.642 1.445.852a7.194 7.194 0 0 0 1.503.356a.522.522 0 0 1 .246.945c-.165.118-.274.33-.335.575a1.944 1.944 0 0 0-.056.385v.019a.523.523 0 0 1-.449.523Z"
+                  clip-rule="evenodd"
                 />
               </svg>
             </a>
             <a
-              href="https://linkedin.com/in/farelyudapratama"
+              href="https://linkedin.com/in/farel-yuda-pratama/"
               title="LinkedIn"
               target="_blank"
               rel="noopener"
             >
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="30"
+                height="30"
+                viewBox="0 0 1025 1024"
+                fill="none"
+              >
                 <path
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  d="M16 8a6 6 0 0 1 6 6v5.5a.5.5 0 0 1-.5.5H18a.5.5 0 0 1-.5-.5V14a2 2 0 0 0-4 0v5.5a.5.5 0 0 1-.5.5h-3.5a.5.5 0 0 1-.5-.5V8.5a.5.5 0 0 1 .5-.5H9a.5.5 0 0 1 .5.5V9"
+                  fill="currentColor"
+                  d="M896.428 1024h-768q-53 0-90.5-37.5T.428 896V128q0-53 37.5-90.5t90.5-37.5h768q53 0 90.5 37.5t37.5 90.5v768q0 53-37.5 90.5t-90.5 37.5zm-640-864q0-13-9.5-22.5t-22.5-9.5h-64q-13 0-22.5 9.5t-9.5 22.5v64q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5-9.5t9.5-22.5v-64zm0 192q0-13-9.5-22.5t-22.5-9.5h-64q-13 0-22.5 9.5t-9.5 22.5v512q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5-9.5t9.5-22.5V352zm640 160q0-80-56-136t-136-56q-44 0-96.5 14t-95.5 39v-21q0-13-9.5-22.5t-22.5-9.5h-64q-13 0-22.5 9.5t-9.5 22.5v512q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5-9.5t9.5-22.5V576q0-53 37.5-90.5t90.5-37.5t90.5 37.5t37.5 90.5v288q0 13 9.5 22.5t22.5 9.5h64q13 0 22.5-9.5t9.5-22.5V512z"
                 />
-                <circle cx="6" cy="6" r="2" stroke="currentColor" stroke-width="1.5" />
               </svg>
             </a>
             <a
-              href="https://instagram.com/farelyudapratama"
+              href="https://instagram.com/yudhart_fp"
               title="Instagram"
               target="_blank"
               rel="noopener"
             >
-              <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+              <svg width="30" height="30" fill="none" viewBox="0 0 24 24">
                 <rect
                   width="16"
                   height="16"
@@ -81,9 +108,9 @@ defineOptions({
         </div>
         <div class="footer-center">
           <div class="footer-quote">
-            <span>Feel free to contact me anytime, anywhere.</span>
+            <span>{{ t('contactMe') }}</span>
             <div class="footer-actions">
-              <a href="/contact" class="footer-btn primary">Let's Contact</a>
+              <a href="/contact" class="footer-btn primary">{{ t('letsContact') }}</a>
               <a href="/resume" class="footer-btn secondary" target="_blank" rel="noopener"
                 >Resume</a
               >
@@ -103,13 +130,18 @@ defineOptions({
       </div>
       <div class="footer-bottom">
         <p class="footer-copyright">©2025 Farel Yuda Pratama. All rights reserved.</p>
-        <div class="badges" aria-hidden="true">
-          <span class="badge">Vue 3</span>
-          <span class="badge">TypeScript</span>
-          <span class="badge">Vite</span>
-          <span class="badge">GSAP</span>
-          <span class="badge">Pinia</span>
-          <span class="badge">Lucide</span>
+        <div class="badges">
+          Build with:
+          <a class="badge" href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>
+          <a class="badge" href="https://www.typescriptlang.org/" target="_blank" rel="noopener"
+            >TypeScript</a
+          >
+          <a class="badge" href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a>
+          <a class="badge" href="https://greensock.com/gsap/" target="_blank" rel="noopener"
+            >GSAP</a
+          >
+          <a class="badge" href="https://pinia.vuejs.org/" target="_blank" rel="noopener">Pinia</a>
+          <a class="badge" href="https://lucide.dev/" target="_blank" rel="noopener">Lucide</a>
         </div>
       </div>
     </div>
@@ -122,7 +154,7 @@ defineOptions({
   position: relative;
   left: 0;
   background: var(--color-background);
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--color-border);
   z-index: 40;
   padding: 1.25rem 0;
 }
@@ -159,10 +191,13 @@ defineOptions({
 }
 .footer-quote {
   color: var(--color-text-secondary);
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-style: italic;
   text-align: center;
   margin: 0;
+}
+.footer-quote span {
+  font-weight: 500;
 }
 .footer-right {
   display: flex;
@@ -188,17 +223,16 @@ defineOptions({
 .badge {
   display: inline-block;
   padding: 0.28rem 0.6rem;
-  border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.012);
   color: var(--color-text-secondary);
   font-size: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  font-weight: 700;
+  border: 1px solid var(--color-border);
 }
 .badge:hover,
 .badge:focus {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.06);
-  color: var(--color-text);
+  background: var(--color-background-dark);
+  border-color: var(--color-text);
+  color: var(--color-background);
 }
 .footer-actions {
   display: flex;
@@ -211,7 +245,6 @@ defineOptions({
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   transition:
@@ -220,17 +253,29 @@ defineOptions({
 }
 .footer-btn.primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-background);
+  transition:
+    background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .footer-btn.secondary {
   background: var(--color-secondary, #444);
   color: #fff;
+  transition:
+    background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .footer-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.03);
+  background: var(--color-accent-green);
+  color: var(--color-text);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
 }
 .footer-btn:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
 }
 .footer-title {
   font-weight: 700;
@@ -249,6 +294,7 @@ defineOptions({
   color: var(--color-text-secondary);
   text-decoration: none;
   font-size: 1rem;
+  font-weight: 500;
   transition: color 0.2s;
   text-align: right;
 }
@@ -258,7 +304,6 @@ defineOptions({
 .footer-desc {
   color: var(--color-text-secondary);
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
 }
 .footer-socials {
   display: flex;
@@ -282,7 +327,7 @@ defineOptions({
   text-align: center;
   color: var(--color-text-secondary);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 700;
   margin: 0;
 }
 .footer-bottom {
@@ -292,73 +337,11 @@ defineOptions({
   gap: 1rem;
   width: 100%;
   margin-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--color-border);
   padding-top: 1rem;
 }
 
 .footer-bottom .badges {
   justify-content: flex-end;
-  opacity: 0.78;
-}
-@media (max-width: 1200px) {
-  .footer-main-3col {
-    flex-direction: column;
-    gap: 2rem;
-    align-items: stretch;
-  }
-  .footer-center {
-    margin: 1.5rem 0 0 0;
-  }
-  .footer-right {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1.5rem;
-  }
-  .footer-links-group {
-    align-items: flex-end;
-  }
-}
-@media (max-width: 900px) {
-  .footer-main-3col {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  .footer-right {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1.5rem;
-  }
-  .footer-links-group {
-    align-items: flex-end;
-  }
-}
-@media (max-width: 600px) {
-  .footer-main-3col {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  .footer {
-    padding: 2rem 0.5rem 1rem 0.5rem;
-  }
-  .footer-right {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1rem;
-  }
-  .footer-center {
-    margin: 1rem 0 0 0;
-  }
-  .footer-bottom {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .footer-bottom .badges {
-    justify-content: center;
-  }
-  .badge {
-    padding: 0.18rem 0.45rem;
-    font-size: 0.82rem;
-  }
 }
 </style>
