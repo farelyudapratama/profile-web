@@ -82,39 +82,11 @@ defineOptions({
         <div class="footer-center">
           <div class="footer-quote">
             <span>Feel free to contact me anytime, anywhere.</span>
-            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center">
-              <a
-                href="/contact"
-                class="footer-btn"
-                style="
-                  padding: 0.6rem 1.4rem;
-                  border-radius: 6px;
-                  background: var(--color-primary);
-                  color: #fff;
-                  font-weight: 600;
-                  text-decoration: none;
-                  transition: background 0.2s;
-                "
+            <div class="footer-actions">
+              <a href="/contact" class="footer-btn primary">Let's Contact</a>
+              <a href="/resume" class="footer-btn secondary" target="_blank" rel="noopener"
+                >Resume</a
               >
-                Let's Contact
-              </a>
-              <a
-                href="/resume"
-                class="footer-btn"
-                target="_blank"
-                rel="noopener"
-                style="
-                  padding: 0.6rem 1.4rem;
-                  border-radius: 6px;
-                  background: var(--color-secondary, #444);
-                  color: #fff;
-                  font-weight: 600;
-                  text-decoration: none;
-                  transition: background 0.2s;
-                "
-              >
-                Resume
-              </a>
             </div>
           </div>
         </div>
@@ -127,20 +99,19 @@ defineOptions({
               <a href="/about">About</a>
             </nav>
           </div>
-          <div class="footer-links-group">
-            <span class="footer-title">Built with</span>
-            <div class="badges" aria-hidden="true">
-              <span class="badge">Vue 3</span>
-              <span class="badge">TypeScript</span>
-              <span class="badge">Vite</span>
-              <span class="badge">GSAP</span>
-              <span class="badge">Pinia</span>
-              <span class="badge">Lucide</span>
-            </div>
-          </div>
         </div>
       </div>
-      <p class="footer-copyright">©2025 Farel Yuda Pratama. All rights reserved.</p>
+      <div class="footer-bottom">
+        <p class="footer-copyright">©2025 Farel Yuda Pratama. All rights reserved.</p>
+        <div class="badges" aria-hidden="true">
+          <span class="badge">Vue 3</span>
+          <span class="badge">TypeScript</span>
+          <span class="badge">Vite</span>
+          <span class="badge">GSAP</span>
+          <span class="badge">Pinia</span>
+          <span class="badge">Lucide</span>
+        </div>
+      </div>
     </div>
   </footer>
 </template>
@@ -153,7 +124,7 @@ defineOptions({
   background: var(--color-background);
   border-top: 1px solid rgba(255, 255, 255, 0.03);
   z-index: 40;
-  padding: 1.25rem 0; /* vertical padding, inner container handles horizontal */
+  padding: 1.25rem 0;
 }
 
 .footer-container {
@@ -169,8 +140,8 @@ defineOptions({
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 2.5rem;
+  align-items: center;
+  gap: 2rem;
 }
 .footer-left {
   display: flex;
@@ -188,16 +159,16 @@ defineOptions({
 }
 .footer-quote {
   color: var(--color-text-secondary);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-style: italic;
   text-align: center;
-  margin-top: 2.5rem;
+  margin: 0;
 }
 .footer-right {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  gap: 2.5rem;
+  align-items: center;
+  gap: 2rem;
   flex: 1 1 0;
   justify-content: flex-end;
 }
@@ -208,19 +179,58 @@ defineOptions({
   gap: 0.7rem;
 }
 .badges {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 0.45rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
 }
 .badge {
   display: inline-block;
   padding: 0.28rem 0.6rem;
   border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.012);
   color: var(--color-text-secondary);
   font-size: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+.badge:hover,
+.badge:focus {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+}
+.footer-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+.footer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    transform 0.06s;
+}
+.footer-btn.primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+.footer-btn.secondary {
+  background: var(--color-secondary, #444);
+  color: #fff;
+}
+.footer-btn:hover {
+  transform: translateY(-1px);
+}
+.footer-btn:active {
+  transform: translateY(0);
 }
 .footer-title {
   font-weight: 700;
@@ -273,7 +283,22 @@ defineOptions({
   color: var(--color-text-secondary);
   font-size: 1rem;
   font-weight: 500;
-  margin-top: 2.5rem;
+  margin: 0;
+}
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 1rem;
+}
+
+.footer-bottom .badges {
+  justify-content: flex-end;
+  opacity: 0.78;
 }
 @media (max-width: 1200px) {
   .footer-main-3col {
@@ -322,6 +347,18 @@ defineOptions({
   }
   .footer-center {
     margin: 1rem 0 0 0;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .footer-bottom .badges {
+    justify-content: center;
+  }
+  .badge {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.82rem;
   }
 }
 </style>
