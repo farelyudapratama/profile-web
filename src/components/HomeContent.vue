@@ -236,7 +236,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 
 <style scoped>
 .home-content {
-  max-width: 1660px;
+  max-width: 1640px;
   min-height: 100vh;
   margin: 0 auto;
   padding: 3rem 1.25rem;
@@ -327,6 +327,8 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  min-height: 2.2rem;
+  margin-top: auto;
 }
 
 .tech-badge {
@@ -340,7 +342,6 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
 .actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: auto;
 }
 
 .actions .btn {
@@ -376,7 +377,6 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   border: 1px solid var(--color-border);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   padding: 0.35rem;
-  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;

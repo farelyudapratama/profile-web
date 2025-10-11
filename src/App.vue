@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { onMounted, nextTick } from 'vue'
 import { RouterView } from 'vue-router'
 import { useThemeStore } from './stores/theme'
 import NavBar from './components/NavBar.vue'
+import Footer from './components/Footer.vue'
 // import IntroAnimation from './components/IntroAnimation.vue'
 
 const themeStore = useThemeStore()
@@ -20,9 +21,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- <IntroAnimation :show="showIntro" @animation-complete="handleAnimationComplete" /> -->
-  <NavBar />
-  <RouterView />
+  <div class="app-root">
+    <NavBar />
+    <main class="app-main">
+      <RouterView />
+    </main>
+    <Footer />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app-main {
+  flex: 1 1 auto;
+}
+</style>

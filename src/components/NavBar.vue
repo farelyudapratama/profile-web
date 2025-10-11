@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { House, FolderKanban, User, Blocks, ChevronDown, Menu, X, Languages } from 'lucide-vue-next'
 import ThemeToggle from './ThemeToggle.vue'
 import { useLanguageStore } from '@/stores/language'
+import type { Component } from 'vue'
 
 const route = useRoute()
 const mobileMenuOpen = ref(false)
@@ -33,7 +34,8 @@ const isActive = (path: string): boolean => {
   return route.path.startsWith(path)
 }
 
-const isChildActive = (children: any[]): boolean => {
+type NavChild = { name: string; path: string; icon: Component }
+const isChildActive = (children: NavChild[]): boolean => {
   return children.some((child) => isActive(child.path))
 }
 
