@@ -78,6 +78,18 @@ onMounted(async () => {
     listeners.push(() => card.removeEventListener('contextmenu', onContext))
   })
 
+  const preventRightClick = (e: MouseEvent) => {
+    if (context.value.visible) {
+      const menu = document.querySelector<HTMLElement>('.context-menu')
+      if (menu && !menu.contains(e.target as Node)) {
+        return
+      }
+      e.preventDefault()
+    }
+  }
+  document.addEventListener('contextmenu', preventRightClick)
+  listeners.push(() => document.removeEventListener('contextmenu', preventRightClick))
+
   const onDocClick = () => (context.value.visible = false)
   document.addEventListener('click', onDocClick)
   listeners.push(() => document.removeEventListener('click', onDocClick))
@@ -147,6 +159,11 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   context.value.x = nx
   context.value.y = ny
 }
+
+function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
+  e.preventDefault()
+  action()
+}
 </script>
 
 <template>
@@ -205,6 +222,13 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
         :class="{ disabled: !selectedProject || !selectedProject.github }"
         :aria-disabled="!selectedProject || !selectedProject.github"
         @click="selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null"
+        @contextmenu="
+          handleRightClickAsLeftClick(
+            () =>
+              selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null,
+            $event,
+          )
+        "
       >
         {{ t('openGithub') }}
       </button>
@@ -214,11 +238,22 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
         :class="{ disabled: !selectedProject || !selectedProject.demo }"
         :aria-disabled="!selectedProject || !selectedProject.demo"
         @click="selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null"
+        @contextmenu="
+          handleRightClickAsLeftClick(
+            () =>
+              selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null,
+            $event,
+          )
+        "
       >
         {{ t('openLiveDemo') }}
       </button>
 
-      <button class="context-item" @click="openImageFor(context.projectId)">
+      <button
+        class="context-item"
+        @click="openImageFor(context.projectId)"
+        @contextmenu="handleRightClickAsLeftClick(() => openImageFor(context.projectId), $event)"
+      >
         {{ t('enlargeImage') }}
       </button>
     </div>
@@ -243,15 +278,7 @@ async function showContextMenu(projectId: number | null, x: number, y: number) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: 2rem;
   text-align: center;
-}
-
-.home-content h2 {
-  font-size: 4.5rem;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  color: var(--color-text);
 }
 
 .home-content p {

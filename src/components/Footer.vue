@@ -231,8 +231,8 @@ const t = (key: string) => {
 .badge:hover,
 .badge:focus {
   background: var(--color-background-dark);
-  border-color: var(--color-text);
-  color: var(--color-background);
+  border-color: var(--color-border-hover);
+  color: var(--secondary-text-dark-900);
 }
 .footer-actions {
   display: flex;

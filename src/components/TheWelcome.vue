@@ -72,7 +72,7 @@ const descriptionLines = computed(() => {
 }
 
 .welcome-title {
-  font-size: 3rem;
+  font-size: 5rem;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   color: var(--color-text);
