@@ -4,6 +4,7 @@ import gsap from 'gsap'
 import { MoveRight } from 'lucide-vue-next'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
+import ProjectCard from '@/components/ProjectCard.vue'
 
 type Project = ProjectType
 
@@ -132,11 +133,6 @@ function openLiveDemoFor(projectId: number | null) {
   context.value.visible = false
 }
 
-function isDemo(demo?: string) {
-  if (!demo) return false
-  return /^https?:\/\//.test(demo) || demo.startsWith('/')
-}
-
 function closeModal() {
   modal.value.visible = false
 }
@@ -169,40 +165,12 @@ function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
 <template>
   <section class="home-content">
     <div class="header">
-      <h2>{{ t('recent') }}</h2>
+      <h2 class="heading-2">{{ t('recent') }}</h2>
       <p class="subtitle">{{ t('subtitle') }}</p>
     </div>
 
     <div class="grid" ref="grid">
-      <article v-for="p in visibleProjects" :key="p.id" class="card project-card" :data-id="p.id">
-        <div class="media">
-          <img :src="p.img" :alt="p.title[lang.currentLang]" />
-        </div>
-
-        <div class="body">
-          <h3 class="title">{{ p.title[lang.currentLang] }}</h3>
-          <p class="desc">{{ p.description[lang.currentLang] }}</p>
-
-          <div class="tech">
-            <span v-for="t in p.tech" :key="t" class="tech-badge">{{ t }}</span>
-          </div>
-
-          <div class="actions">
-            <template v-if="isDemo(p.demo)">
-              <a :href="p.demo" class="btn btn-primary" target="_blank" rel="noopener">{{
-                t('liveDemo')
-              }}</a>
-            </template>
-            <template v-else-if="p.github">
-              <a :href="p.github" class="btn btn-primary" target="_blank" rel="noopener">{{
-                t('github')
-              }}</a>
-            </template>
-
-            <a :href="`/projects/${p.id}`" class="btn btn-primary">{{ t('details') }}</a>
-          </div>
-        </div>
-      </article>
+      <ProjectCard v-for="p in visibleProjects" :key="p.id" :project="p" />
     </div>
 
     <div class="more">
@@ -309,22 +277,6 @@ function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
 }
 .project-card:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-}
-
-.media {
-  position: relative;
-  height: 160px;
-  min-height: 160px;
-  background: var(--color-background-mute);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.media img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  filter: saturate(1.05) contrast(1.02);
 }
 
 .body {
