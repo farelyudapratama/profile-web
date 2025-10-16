@@ -5,13 +5,19 @@ import { MoveRight } from 'lucide-vue-next'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
 import ProjectCard from '@/components/ProjectCard.vue'
+import ContextMenu from '@/components/ContextMenu.vue'
 
 type Project = ProjectType
 
 const projects = ref<Project[]>(allProjects)
 const visibleProjects = ref(projects.value.filter((p) => p.featured))
 const grid = ref<HTMLElement | null>(null)
-const context = ref({ visible: false, x: 0, y: 0, projectId: null as number | null })
+const contextMenuState = ref({
+  visible: false,
+  x: 0,
+  y: 0,
+  projectId: null as number | null,
+})
 const modal = ref({ visible: false, src: '', title: '' })
 const listeners: Array<() => void> = []
 
@@ -33,7 +39,7 @@ const t = (key: string) => {
 }
 
 const selectedProject = computed(() => {
-  const id = context.value.projectId
+  const id = contextMenuState.value.projectId
   if (id == null) return null
   return projects.value.find((p) => p.id === id) ?? null
 })
@@ -79,25 +85,9 @@ onMounted(async () => {
     listeners.push(() => card.removeEventListener('contextmenu', onContext))
   })
 
-  const preventRightClick = (e: MouseEvent) => {
-    if (context.value.visible) {
-      const menu = document.querySelector<HTMLElement>('.context-menu')
-      if (menu && !menu.contains(e.target as Node)) {
-        return
-      }
-      e.preventDefault()
-    }
-  }
-  document.addEventListener('contextmenu', preventRightClick)
-  listeners.push(() => document.removeEventListener('contextmenu', preventRightClick))
-
-  const onDocClick = () => (context.value.visible = false)
-  document.addEventListener('click', onDocClick)
-  listeners.push(() => document.removeEventListener('click', onDocClick))
-
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
-      context.value.visible = false
+      contextMenuState.value.visible = false
       modal.value.visible = false
     }
   }
@@ -114,7 +104,7 @@ function openGithubFor(projectId: number | null) {
   if (p && p.github) {
     window.open(p.github, '_blank')
   }
-  context.value.visible = false
+  closeContextMenu()
 }
 
 function openImageFor(projectId: number | null) {
@@ -122,7 +112,7 @@ function openImageFor(projectId: number | null) {
   if (p) {
     modal.value = { visible: true, src: p.img, title: p.title[lang.currentLang] }
   }
-  context.value.visible = false
+  closeContextMenu()
 }
 
 function openLiveDemoFor(projectId: number | null) {
@@ -130,36 +120,46 @@ function openLiveDemoFor(projectId: number | null) {
   if (p && p.demo) {
     window.open(p.demo, '_blank')
   }
-  context.value.visible = false
+  closeContextMenu()
 }
 
 function closeModal() {
   modal.value.visible = false
 }
 
+function closeContextMenu() {
+  contextMenuState.value.visible = false
+}
+
 async function showContextMenu(projectId: number | null, x: number, y: number) {
-  context.value = { visible: true, x, y, projectId }
+  contextMenuState.value = { visible: true, x, y, projectId }
   await nextTick()
-  const menu = document.querySelector<HTMLElement>('.context-menu')
-  if (!menu) return
-  const rect = menu.getBoundingClientRect()
-  const vw = window.innerWidth
-  const vh = window.innerHeight
-
-  let nx = x
-  let ny = y
-
-  if (x + rect.width > vw) nx = Math.max(8, x - rect.width)
-  if (y + rect.height > vh) ny = Math.max(8, vh - rect.height - 8)
-
-  context.value.x = nx
-  context.value.y = ny
 }
 
-function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
-  e.preventDefault()
-  action()
-}
+const contextMenuItems = computed(() => {
+  const project = selectedProject.value
+  if (!project) return []
+
+  const items = [
+    {
+      label: t('openGithub'),
+      action: () => openGithubFor(project.id),
+      disabled: !project.github,
+    },
+    {
+      label: t('openLiveDemo'),
+      action: () => openLiveDemoFor(project.id),
+      disabled: !project.demo,
+    },
+    { separator: true, label: '' },
+    {
+      label: t('enlargeImage'),
+      action: () => openImageFor(project.id),
+    },
+  ]
+
+  return items
+})
 </script>
 
 <template>
@@ -170,7 +170,17 @@ function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
     </div>
 
     <div class="grid" ref="grid">
-      <ProjectCard v-for="p in visibleProjects" :key="p.id" :project="p" />
+      <ProjectCard
+        v-for="p in visibleProjects"
+        :key="p.id"
+        :project="p"
+        :data-id="p.id"
+        @contextmenu="(event: MouseEvent) => {
+          event.preventDefault();
+          const { clientX: x, clientY: y } = event;
+          showContextMenu(p.id, x, y);
+        }"
+      />
     </div>
 
     <div class="more">
@@ -179,52 +189,13 @@ function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
       /></a>
     </div>
 
-    <!-- custom context menu -->
-    <div
-      v-if="context.visible"
-      class="context-menu"
-      :style="{ left: context.x + 'px', top: context.y + 'px' }"
-    >
-      <button
-        class="context-item"
-        :class="{ disabled: !selectedProject || !selectedProject.github }"
-        :aria-disabled="!selectedProject || !selectedProject.github"
-        @click="selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null"
-        @contextmenu="
-          handleRightClickAsLeftClick(
-            () =>
-              selectedProject && selectedProject.github ? openGithubFor(context.projectId) : null,
-            $event,
-          )
-        "
-      >
-        {{ t('openGithub') }}
-      </button>
-
-      <button
-        class="context-item"
-        :class="{ disabled: !selectedProject || !selectedProject.demo }"
-        :aria-disabled="!selectedProject || !selectedProject.demo"
-        @click="selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null"
-        @contextmenu="
-          handleRightClickAsLeftClick(
-            () =>
-              selectedProject && selectedProject.demo ? openLiveDemoFor(context.projectId) : null,
-            $event,
-          )
-        "
-      >
-        {{ t('openLiveDemo') }}
-      </button>
-
-      <button
-        class="context-item"
-        @click="openImageFor(context.projectId)"
-        @contextmenu="handleRightClickAsLeftClick(() => openImageFor(context.projectId), $event)"
-      >
-        {{ t('enlargeImage') }}
-      </button>
-    </div>
+    <ContextMenu
+      :visible="contextMenuState.visible"
+      :x="contextMenuState.x"
+      :y="contextMenuState.y"
+      :items="contextMenuItems"
+      @close="closeContextMenu"
+    />
 
     <!-- image modal -->
     <div v-if="modal.visible" class="image-modal" @click.self="closeModal">
@@ -346,37 +317,6 @@ function handleRightClickAsLeftClick(action: () => void, e: MouseEvent) {
 
 .btn-primary:hover .arrow-right {
   transform: rotate(-45deg);
-}
-
-/* context menu */
-.context-menu {
-  position: fixed;
-  z-index: 60;
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  padding: 0.35rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.context-item {
-  background: transparent;
-  border: none;
-  padding: 0.45rem 0.75rem;
-  color: var(--color-text);
-  font-size: 1.3rem;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 0.35rem;
-}
-.context-item:hover {
-  background: var(--color-background-soft);
-}
-
-.context-item.disabled {
-  opacity: 0.45;
-  pointer-events: none;
 }
 
 /* image modal overlay */
