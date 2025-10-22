@@ -6,6 +6,7 @@ import { projects as allProjects, type Project as ProjectType } from '@/data/pro
 import { useLanguageStore } from '@/stores/language'
 import ProjectCard from '@/components/ProjectCard.vue'
 import ContextMenu from '@/components/ContextMenu.vue'
+import TechStack from '@/components/TechStack.vue'
 
 type Project = ProjectType
 
@@ -169,17 +170,22 @@ const contextMenuItems = computed(() => {
       <p class="subtitle">{{ t('subtitle') }}</p>
     </div>
 
+    <!-- Tech Stack Section -->
+    <TechStack />
+
     <div class="grid" ref="grid">
       <ProjectCard
         v-for="p in visibleProjects"
         :key="p.id"
         :project="p"
         :data-id="p.id"
-        @contextmenu="(event: MouseEvent) => {
-          event.preventDefault();
-          const { clientX: x, clientY: y } = event;
-          showContextMenu(p.id, x, y);
-        }"
+        @contextmenu="
+          (event: MouseEvent) => {
+            event.preventDefault()
+            const { clientX: x, clientY: y } = event
+            showContextMenu(p.id, x, y)
+          }
+        "
       />
     </div>
 
