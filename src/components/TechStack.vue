@@ -41,6 +41,7 @@ const images = [
   width: 100%;
   display: flex;
   overflow-x: auto;
+  border: 1px solid var(--color-border);
 }
 .carousel::-webkit-scrollbar {
   display: none;
