@@ -114,7 +114,11 @@ const modal = ref({ visible: false, src: '', title: '' })
 const openImageFor = (projectId: number | null) => {
   const p = projects.value.find((x) => x.id === projectId)
   if (p) {
-    modal.value = { visible: true, src: p.img, title: p.title[useLanguageStore().currentLang] }
+    modal.value = {
+      visible: true,
+      src: p.images[0],
+      title: p.title[useLanguageStore().currentLang],
+    }
   }
   closeContextMenu()
 }
@@ -294,7 +298,6 @@ Doain aja kedepannya lebih banyak yang sukses daripada yang ngendok ae di folder
   grid-template-columns: repeat(2, minmax(280px, 1fr));
   justify-items: center;
   align-items: stretch;
-  gap: 1rem;
 }
 
 .project-card {

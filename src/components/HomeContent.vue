@@ -111,7 +111,7 @@ function openGithubFor(projectId: number | null) {
 function openImageFor(projectId: number | null) {
   const p = projects.value.find((x) => x.id === projectId)
   if (p) {
-    modal.value = { visible: true, src: p.img, title: p.title[lang.currentLang] }
+    modal.value = { visible: true, src: p.images[0], title: p.title[lang.currentLang] }
   }
   closeContextMenu()
 }

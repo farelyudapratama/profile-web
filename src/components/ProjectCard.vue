@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// no runtime imports needed here
 import type { Project as ProjectType } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
+import { ref, computed } from 'vue'
 
-defineProps({
+const props = defineProps({
   project: {
     type: Object as () => ProjectType,
     required: true,
@@ -16,12 +16,70 @@ const isDemo = (demo?: string) => {
   if (!demo) return false
   return /^https?:\/\//.test(demo) || demo.startsWith('/')
 }
+
+// State untuk slider
+const currentIndex = ref(0)
+const direction = ref(1) // 1 untuk maju (kanan ke kiri), -1 untuk mundur
+const sliderContainer = ref<HTMLElement | null>(null)
+
+// Gunakan computed untuk mengamankan akses ke project.images
+const totalImages = computed(() => props.project.images?.length || 0)
+
+// Fungsi untuk memperbarui gambar berikutnya
+const goToNextImage = () => {
+  if (totalImages.value <= 1) return // Jika hanya ada satu gambar, tidak perlu berpindah
+
+  // Jika mencapai akhir, ubah arah menjadi mundur
+  if (currentIndex.value === totalImages.value - 1) {
+    direction.value = -1
+  }
+  // Jika mencapai awal, ubah arah menjadi maju
+  else if (currentIndex.value === 0) {
+    direction.value = 1
+  }
+
+  // Update index berdasarkan arah
+  const nextIndex = currentIndex.value + direction.value
+
+  // Cek apakah nextIndex valid, jika tidak, reset arah dan posisi
+  if (nextIndex >= totalImages.value) {
+    currentIndex.value = totalImages.value - 2 // Gambar sebelum terakhir
+    direction.value = -1 // Balik arah
+  } else if (nextIndex < 0) {
+    currentIndex.value = 1 // Gambar kedua
+    direction.value = 1 // Maju arah
+  } else {
+    currentIndex.value = nextIndex
+  }
+}
+
+let intervalId: number | undefined
+if (totalImages.value > 1) {
+  intervalId = window.setInterval(goToNextImage, 3000)
+}
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
+})
+
+import { onUnmounted } from 'vue'
 </script>
 
 <template>
   <article class="card project-card" :data-id="project.id">
     <div class="media">
-      <img :src="project.img" :alt="project.title[lang.currentLang]" />
+      <div class="slider-container" ref="sliderContainer">
+        <img
+          v-for="(img, index) in project.images"
+          :key="index"
+          :src="img"
+          :alt="project.title[lang.currentLang]"
+          class="slider-image"
+          :class="{ active: index === currentIndex }"
+        />
+      </div>
     </div>
 
     <div class="body">
@@ -51,7 +109,6 @@ const isDemo = (demo?: string) => {
 </template>
 
 <style scoped>
-/* keep styles consistent with HomeContent's project-card */
 .project-card {
   display: flex;
   flex-direction: column;
@@ -67,6 +124,27 @@ const isDemo = (demo?: string) => {
 }
 .project-card:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slider-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.slider-image.active {
+  opacity: 1;
 }
 
 .body {
