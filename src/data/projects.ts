@@ -103,4 +103,19 @@ export const projects: Project[] = [
     link: '#/projects/4',
     featured: true,
   },
+  {
+    id: 5,
+    title: {
+      en: 'Code Snippet Manager',
+      id: 'Manajer Cuplikan Kode',
+    },
+    description: {
+      en: 'A web app to save and organize your code snippets with tagging and search functionality.',
+      id: 'Aplikasi web untuk menyimpan dan mengatur cuplikan kode Anda dengan fungsi penandaan dan pencarian.',
+    },
+    images: ['/public/img/mas.webp', '/public/img/bubble.webp'],
+    tech: ['Vue', 'Firebase'],
+    link: '#/projects/5',
+    github: 'https://github.com/USERNAME/code-snippet-manager',
+  },
 ]

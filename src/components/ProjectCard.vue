@@ -2,6 +2,7 @@
 import type { Project as ProjectType } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
 import { ref, computed } from 'vue'
+import { onUnmounted } from 'vue'
 
 const props = defineProps({
   project: {
@@ -63,8 +64,6 @@ onUnmounted(() => {
     clearInterval(intervalId)
   }
 })
-
-import { onUnmounted } from 'vue'
 </script>
 
 <template>
