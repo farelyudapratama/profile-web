@@ -38,14 +38,6 @@ const t = (key: string) => {
   text-align: center;
 }
 
-.subtitle {
-  white-space: pre-line;
-  text-align: left;
-  display: inline-block;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 /* responsive */
 @media (max-width: 640px) {
   .header h2 {

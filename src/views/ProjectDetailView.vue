@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ExternalLink, Github, ChevronUp, ChevronDown, X } from 'lucide-vue-next'
+import { ExternalLink, Github, X } from 'lucide-vue-next'
 import { projects } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
+import gsap from 'gsap'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,9 +13,15 @@ const lang = useLanguageStore()
 const id = Number(route.params.id)
 const project = projects.find((p) => p.id === id)
 
-const currentImageIndex = ref(0)
 const fullscreenImage = ref<string | null>(null)
 const activeTab = ref<'info' | 'gallery'>('info')
+const galleryContainerRef = ref<HTMLDivElement | null>(null)
+const scrollContainerRef = ref<HTMLDivElement | null>(null)
+const timeline = ref<gsap.core.Timeline | null>(null)
+const timeScaleTween = ref<gsap.core.Tween | null>(null)
+const isPaused = ref(false)
+const pauseTimeout = ref<number | null>(null)
+const isLargeScreen = ref(window.innerWidth > 1024)
 
 const currentLang = computed(() => lang.currentLang || 'id')
 
@@ -28,29 +35,68 @@ const isDetailedProject = computed(() => {
   )
 })
 
-const hasMultipleImages = computed(() => {
-  return project && project.images.length > 1
-})
+const setupInfiniteVerticalScroll = () => {
+  if (!galleryContainerRef.value || !project || !isLargeScreen.value) return
 
-const canScrollUp = computed(() => currentImageIndex.value > 0)
-const canScrollDown = computed(() => {
-  if (!project) return false
-  return currentImageIndex.value < project.images.length - 1
-})
+  gsap.set(galleryContainerRef.value, {
+    yPercent: 0,
+  })
 
-function scrollToImage(index: number) {
-  currentImageIndex.value = index
-}
-
-function nextImage() {
-  if (canScrollDown.value) {
-    currentImageIndex.value++
+  if (timeline.value) {
+    timeline.value.kill()
   }
+
+  const speed = project.images.length * 15
+
+  timeline.value = gsap
+    .timeline({ defaults: { ease: 'power1.inOut', repeat: -1 } })
+    .to(galleryContainerRef.value, {
+      yPercent: -50,
+      duration: speed,
+      ease: 'none',
+    })
+    .set(galleryContainerRef.value, { yPercent: 0 })
 }
 
-function prevImage() {
-  if (canScrollUp.value) {
-    currentImageIndex.value--
+const pauseScroll = () => {
+  if (!timeline.value || !isLargeScreen.value) return
+  isPaused.value = true
+  if (timeScaleTween.value) timeScaleTween.value.kill()
+  timeScaleTween.value = gsap.to(timeline.value, {
+    timeScale: 0,
+    duration: 0.4,
+  })
+}
+
+const resumeScroll = () => {
+  if (!timeline.value || !isLargeScreen.value) return
+  if (pauseTimeout.value) {
+    clearTimeout(pauseTimeout.value)
+  }
+  pauseTimeout.value = window.setTimeout(() => {
+    isPaused.value = false
+    if (timeScaleTween.value) timeScaleTween.value.kill()
+    timeScaleTween.value = gsap.to(timeline.value, {
+      timeScale: 1,
+      duration: 0.2,
+    })
+  }, 500)
+}
+
+const handleResize = () => {
+  const wasLargeScreen = isLargeScreen.value
+  isLargeScreen.value = window.innerWidth > 1024
+
+  if (wasLargeScreen !== isLargeScreen.value) {
+    if (timeline.value) {
+      timeline.value.kill()
+      timeline.value = null
+    }
+    if (isLargeScreen.value) {
+      setTimeout(() => {
+        setupInfiniteVerticalScroll()
+      }, 100)
+    }
   }
 }
 
@@ -67,6 +113,22 @@ function handleKeydown(e: KeyboardEvent) {
     closeFullscreen()
   }
 }
+
+onMounted(() => {
+  if (project && isDetailedProject.value) {
+    setTimeout(() => {
+      setupInfiniteVerticalScroll()
+    }, 100)
+  }
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  if (timeline.value) timeline.value.kill()
+  if (timeScaleTween.value) timeScaleTween.value.kill()
+  if (pauseTimeout.value) clearTimeout(pauseTimeout.value)
+  window.removeEventListener('resize', handleResize)
+})
 
 if (!project) {
   router.replace({ name: 'projects' })
@@ -109,17 +171,17 @@ const labels = {
 
       <div class="detail-container">
         <div class="info-section" :class="{ hidden: activeTab === 'gallery' }">
-          <h1 class="project-title">{{ project.title[currentLang] }}</h1>
+          <div class="project-title">
+            <h2>{{ project.title[currentLang] }}</h2>
+          </div>
 
           <section class="info-block">
-            <h2 class="section-title">{{ labels.overview[currentLang] }}</h2>
             <p class="description">
               {{ project.longDescription?.[currentLang] || project.description[currentLang] }}
             </p>
           </section>
 
           <section class="info-block" v-if="project.features">
-            <h2 class="section-title">{{ labels.features[currentLang] }}</h2>
             <ul class="features-list">
               <li v-for="(feature, idx) in project.features[currentLang]" :key="idx">
                 {{ feature }}
@@ -128,7 +190,6 @@ const labels = {
           </section>
 
           <section class="info-block" v-if="project.architectureImage">
-            <h2 class="section-title">{{ labels.architecture[currentLang] }}</h2>
             <div class="architecture-img">
               <img
                 :src="project.architectureImage"
@@ -139,15 +200,9 @@ const labels = {
           </section>
 
           <section class="info-block">
-            <h2 class="section-title">{{ labels.techStack[currentLang] }}</h2>
             <div class="tech-list">
               <span v-for="tech in project.tech" :key="tech" class="tech-badge">{{ tech }}</span>
             </div>
-          </section>
-
-          <section class="info-block" v-if="project.challenges">
-            <h2 class="section-title">{{ labels.challenges[currentLang] }}</h2>
-            <p class="challenges-text">{{ project.challenges[currentLang] }}</p>
           </section>
 
           <section class="info-block links-section">
@@ -177,124 +232,45 @@ const labels = {
         <div class="gallery-section" :class="{ hidden: activeTab === 'info' }">
           <h3 class="gallery-title">{{ labels.screenshots[currentLang] }}</h3>
 
-          <div class="carousel-container">
-            <button
-              v-if="hasMultipleImages && canScrollUp"
-              class="carousel-nav up"
-              @click="prevImage"
-              aria-label="Previous image"
+          <div class="vertical-carousel-wrapper">
+            <div
+              ref="scrollContainerRef"
+              class="vertical-carousel-container"
+              @mouseenter="pauseScroll"
+              @mouseleave="resumeScroll"
             >
-              <ChevronUp :size="24" />
-            </button>
-
-            <div class="images-stack">
-              <div
-                v-for="(img, index) in project.images"
-                :key="index"
-                class="stack-item"
-                :class="{
-                  active: index === currentImageIndex,
-                  prev: index < currentImageIndex,
-                  next: index > currentImageIndex,
-                }"
-                :style="{
-                  zIndex: project.images.length - Math.abs(currentImageIndex - index),
-                  transform: `translateY(${(index - currentImageIndex) * 15}px) scale(${
-                    index === currentImageIndex
-                      ? 1
-                      : 0.92 - Math.abs(index - currentImageIndex) * 0.05
-                  })`,
-                  opacity:
-                    Math.abs(index - currentImageIndex) > 2
-                      ? 0
-                      : 1 - Math.abs(index - currentImageIndex) * 0.25,
-                }"
-                @click="index === currentImageIndex && openFullscreen(img)"
-              >
-                <img :src="img" :alt="`${project.title[currentLang]} screenshot ${index + 1}`" />
+              <div ref="galleryContainerRef" class="images-vertical-stack">
+                <!-- Group 1 -->
+                <div class="vertical-group">
+                  <div
+                    v-for="(img, index) in project.images"
+                    :key="index"
+                    class="vertical-image-item"
+                    @click="openFullscreen(img)"
+                  >
+                    <img
+                      :src="img"
+                      :alt="`${project.title[currentLang]} screenshot ${index + 1}`"
+                    />
+                  </div>
+                </div>
+                <!-- Group 2 (Duplicate for seamless loop - only on large screens) -->
+                <div class="vertical-group duplicate-group">
+                  <div
+                    v-for="(img, index) in project.images"
+                    :key="`duplicate-${index}`"
+                    class="vertical-image-item"
+                    @click="openFullscreen(img)"
+                  >
+                    <img
+                      :src="img"
+                      :alt="`${project.title[currentLang]} screenshot ${index + 1}`"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-
-            <button
-              v-if="hasMultipleImages && canScrollDown"
-              class="carousel-nav down"
-              @click="nextImage"
-              aria-label="Next image"
-            >
-              <ChevronDown :size="24" />
-            </button>
           </div>
-
-          <div class="dots-indicator" v-if="hasMultipleImages">
-            <button
-              v-for="(img, index) in project.images"
-              :key="index"
-              class="dot"
-              :class="{ active: index === currentImageIndex }"
-              @click="scrollToImage(index)"
-              :aria-label="`Go to image ${index + 1}`"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <template v-else>
-      <div class="simple-container">
-        <h1 class="simple-title">{{ project.title[currentLang] }}</h1>
-
-        <p class="simple-description">{{ project.description[currentLang] }}</p>
-
-        <div class="simple-gallery">
-          <div class="simple-main-image">
-            <img
-              :src="project.images[currentImageIndex]"
-              :alt="project.title[currentLang]"
-              @click="openFullscreen(project.images[currentImageIndex])"
-            />
-          </div>
-
-          <div v-if="hasMultipleImages" class="simple-thumbnails">
-            <button
-              v-for="(img, index) in project.images"
-              :key="index"
-              class="simple-thumb"
-              :class="{ active: index === currentImageIndex }"
-              @click="scrollToImage(index)"
-            >
-              <img :src="img" :alt="`${project.title[currentLang]} - ${index + 1}`" />
-            </button>
-          </div>
-        </div>
-
-        <div class="simple-tech">
-          <h3 class="simple-tech-title">{{ labels.techStack[currentLang] }}</h3>
-          <div class="tech-list">
-            <span v-for="tech in project.tech" :key="tech" class="tech-badge">{{ tech }}</span>
-          </div>
-        </div>
-
-        <div class="simple-links">
-          <a
-            v-if="project.demo"
-            :href="project.demo"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-primary"
-          >
-            <ExternalLink :size="18" />
-            <span>{{ labels.viewDemo[currentLang] }}</span>
-          </a>
-          <a
-            v-if="project.github"
-            :href="project.github"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-outline"
-          >
-            <Github :size="18" />
-            <span>{{ labels.viewGithub[currentLang] }}</span>
-          </a>
         </div>
       </div>
     </template>
@@ -312,7 +288,7 @@ const labels = {
 
 <style scoped>
 .project-detail {
-  max-width: 1400px;
+  max-width: 90vw;
   margin: 0 auto;
   padding: 2rem 1.5rem;
   min-height: 100vh;
@@ -354,45 +330,40 @@ const labels = {
 
 .detail-container {
   display: grid;
+  border: 1px solid var(--color-border);
   grid-template-columns: 1fr 1.2fr;
   gap: 3rem;
   align-items: start;
 }
 
-/* Info Section (Left) */
 .info-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
 }
 
 .project-title {
+  border: 1px solid var(--color-border);
+}
+
+.project-title h2 {
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text);
-  margin-bottom: 0.5rem;
+  padding: 1.5rem;
 }
 
 .info-block {
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
-  border-bottom: 2px solid var(--color-border);
-  padding-bottom: 0.5rem;
-}
-
-.description,
-.challenges-text {
+.description {
   font-size: 1.05rem;
   line-height: 1.7;
   color: var(--color-text-secondary);
+  padding: 1.5rem;
 }
 
 .features-list {
@@ -402,6 +373,7 @@ const labels = {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding: 1.5rem;
 }
 
 .features-list li {
@@ -420,8 +392,6 @@ const labels = {
 }
 
 .architecture-img {
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -440,22 +410,21 @@ const labels = {
 .tech-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
 }
 
 .tech-badge {
+  flex: 1 1 0;
+  min-width: 100px;
   padding: 0.5rem 1rem;
-  background: var(--color-background-soft);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text);
+  text-align: center;
 }
 
 .links-section {
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -464,7 +433,7 @@ const labels = {
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 0;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -473,14 +442,19 @@ const labels = {
 }
 
 .btn-primary {
-  background: var(--color-text);
+  background: var(--color-primary);
   color: var(--color-background);
-  border-color: var(--color-text);
+  border-color: var(--color-border);
+  font-weight: 600;
+}
+
+.btn-primary::before {
+  background: var(--color-accent-green);
+  color: var(--color-text);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #fff;
 }
 
 .btn-outline {
@@ -493,7 +467,6 @@ const labels = {
   background: var(--color-border);
 }
 
-/* Gallery Section (Right) */
 .gallery-section {
   position: sticky;
   top: 2rem;
@@ -509,110 +482,84 @@ const labels = {
   text-align: center;
 }
 
-.carousel-container {
+.vertical-carousel-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.vertical-carousel-container {
+  flex: 1;
+  max-width: 600px;
+  height: 80vh;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   position: relative;
-  width: 100%;
-  height: 600px;
+  margin: 0 auto;
+}
+
+.images-vertical-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.carousel-nav {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-  z-index: 10;
-}
-
-.carousel-nav:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: translateX(-50%) scale(1.1);
-}
-
-.carousel-nav.up {
-  top: 1rem;
-}
-
-.carousel-nav.down {
-  bottom: 1rem;
-}
-
-.images-stack {
-  position: relative;
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  will-change: transform;
 }
 
-.stack-item {
-  position: absolute;
-  width: 90%;
-  max-width: 500px;
-  aspect-ratio: 16 / 10;
-  border: 3px solid var(--color-border);
-  border-radius: 12px;
+.vertical-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.duplicate-group {
+  display: flex;
+}
+
+@media (max-width: 1024px) {
+  .duplicate-group {
+    display: none;
+  }
+}
+
+.vertical-image-item {
+  width: 100%;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid var(--color-border);
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  cursor: pointer;
-  background: var(--color-background-soft);
-}
-
-.stack-item.active {
-  cursor: pointer;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.stack-item.active:hover {
-  transform: translateY(0) scale(1.02) !important;
-}
-
-.stack-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.dots-indicator {
+  background: var(--color-background);
+  padding: 1rem;
   display: flex;
-  gap: 0.5rem;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-border);
-  border: none;
+.vertical-image-item img {
+  width: 90%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  margin: 0 auto;
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-.dot.active {
-  background: var(--color-text);
-  transform: scale(1.3);
+.vertical-image-item:last-child {
+  border-bottom: none;
 }
 
-.dot:hover {
-  transform: scale(1.2);
+.vertical-image-item:hover {
+  background: var(--color-background-soft);
+  transform: scale(1.02);
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Fullscreen Modal */
@@ -657,116 +604,6 @@ const labels = {
   transform: scale(1.1);
 }
 
-/* Simple Layout Styles */
-.simple-container {
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  text-align: center;
-}
-
-.simple-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1.2;
-}
-
-.simple-description {
-  font-size: 1.15rem;
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.simple-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.simple-main-image {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  border: 2px solid var(--color-border);
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  background: var(--color-background-soft);
-}
-
-.simple-main-image:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
-
-.simple-main-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.simple-thumbnails {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.simple-thumb {
-  width: 100px;
-  height: 70px;
-  border: 2px solid var(--color-border);
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: var(--color-background-soft);
-  padding: 0;
-}
-
-.simple-thumb:hover {
-  border-color: var(--color-text);
-  transform: scale(1.05);
-}
-
-.simple-thumb.active {
-  border-color: var(--color-text);
-  box-shadow: 0 0 0 2px var(--color-text);
-}
-
-.simple-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.simple-tech {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.simple-tech-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.simple-links {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .detail-container {
@@ -788,8 +625,15 @@ const labels = {
     display: none;
   }
 
-  .carousel-container {
-    height: 500px;
+  .vertical-carousel-container {
+    height: 60vh;
+    max-width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .vertical-carousel-wrapper {
+    flex-direction: column;
   }
 }
 
@@ -798,16 +642,15 @@ const labels = {
     font-size: 2rem;
   }
 
-  .section-title {
-    font-size: 1.25rem;
+  .vertical-carousel-container {
+    height: 50vh;
+    max-width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  .carousel-container {
-    height: 400px;
-  }
-
-  .stack-item {
-    width: 95%;
+  .vertical-image-item {
+    padding: 0.5rem;
   }
 
   .links-section {
@@ -817,32 +660,6 @@ const labels = {
   .btn {
     width: 100%;
     justify-content: center;
-  }
-
-  /* Simple layout responsive */
-  .simple-title {
-    font-size: 1.875rem;
-  }
-
-  .simple-description {
-    font-size: 1rem;
-  }
-
-  .simple-main-image {
-    aspect-ratio: 4 / 3;
-  }
-
-  .simple-thumb {
-    width: 70px;
-    height: 50px;
-  }
-
-  .simple-links {
-    flex-direction: column;
-  }
-
-  .simple-links .btn {
-    width: 100%;
   }
 }
 </style>
