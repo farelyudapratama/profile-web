@@ -11,6 +11,10 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits<{
+  openImage: [imageSrc: string, projectId: number]
+}>()
+
 const lang = useLanguageStore()
 
 const isDemo = (demo?: string) => {
@@ -18,12 +22,21 @@ const isDemo = (demo?: string) => {
   return /^https?:\/\//.test(demo) || demo.startsWith('/')
 }
 
+const hasDetailedInfo = computed(() => {
+  return !!(
+    props.project.longDescription ||
+    props.project.features ||
+    props.project.challenges ||
+    props.project.architectureImage
+  )
+})
+
 // State untuk slider
 const currentIndex = ref(0)
 const direction = ref(1) // 1 untuk maju (kanan ke kiri), -1 untuk mundur
 const sliderContainer = ref<HTMLElement | null>(null)
 
-// Gunakan computed untuk mengamankan akses ke project.images
+// untuk mengamankan akses ke project.images
 const totalImages = computed(() => props.project.images?.length || 0)
 
 // Fungsi untuk memperbarui gambar berikutnya
@@ -54,6 +67,22 @@ const goToNextImage = () => {
   }
 }
 
+function handleMediaClick() {
+  // Cek ukuran layar jika lebih dari 768px tidak bisa klik
+  if (window.innerWidth > 768) {
+    return
+  }
+
+  // Pada layar yang lebih kecil, izinkan klik langsung untuk membuka modal gambar
+  if (
+    props.project.images &&
+    props.project.images.length > 0 &&
+    currentIndex.value < props.project.images.length
+  ) {
+    emit('openImage', props.project.images[currentIndex.value], props.project.id)
+  }
+}
+
 let intervalId: number | undefined
 if (totalImages.value > 1) {
   intervalId = window.setInterval(goToNextImage, 3000)
@@ -68,7 +97,7 @@ onUnmounted(() => {
 
 <template>
   <article class="card project-card" :data-id="project.id">
-    <div class="media">
+    <div class="media" @click="handleMediaClick">
       <div class="slider-container" ref="sliderContainer">
         <img
           v-for="(img, index) in project.images"
@@ -101,7 +130,7 @@ onUnmounted(() => {
           >
         </template>
 
-        <a :href="`/projects/${project.id}`" class="btn btn-primary">Details</a>
+        <a v-if="hasDetailedInfo" :href="`/projects/${project.id}`" class="btn btn-primary">Details</a>
       </div>
     </div>
   </article>
@@ -123,6 +152,12 @@ onUnmounted(() => {
 }
 .project-card:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.media {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
 }
 
 .slider-container {

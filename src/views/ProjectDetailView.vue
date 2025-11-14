@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ExternalLink, Github, X } from 'lucide-vue-next'
+import { ExternalLink, Github } from 'lucide-vue-next'
+import ImageModal from '@/components/ImageModal.vue'
 import { projects } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
 import gsap from 'gsap'
@@ -13,7 +14,8 @@ const lang = useLanguageStore()
 const id = Number(route.params.id)
 const project = projects.find((p) => p.id === id)
 
-const fullscreenImage = ref<string | null>(null)
+const imageModalVisible = ref(false)
+const imageModalCurrentIndex = ref(0)
 const activeTab = ref<'info' | 'gallery'>('info')
 const galleryContainerRef = ref<HTMLDivElement | null>(null)
 const scrollContainerRef = ref<HTMLDivElement | null>(null)
@@ -22,6 +24,13 @@ const timeScaleTween = ref<gsap.core.Tween | null>(null)
 const isPaused = ref(false)
 const pauseTimeout = ref<number | null>(null)
 const isLargeScreen = ref(window.innerWidth > 1024)
+const allImages = computed(() => {
+  const images = project?.images || []
+  if (project?.architectureImage) {
+    return [...images, project.architectureImage]
+  }
+  return images
+})
 
 const currentLang = computed(() => lang.currentLang || 'id')
 
@@ -101,17 +110,16 @@ const handleResize = () => {
 }
 
 function openFullscreen(imageSrc: string) {
-  fullscreenImage.value = imageSrc
+  imageModalCurrentIndex.value = allImages.value.indexOf(imageSrc)
+  imageModalVisible.value = true
 }
 
-function closeFullscreen() {
-  fullscreenImage.value = null
+function closeImageModal() {
+  imageModalVisible.value = false
 }
 
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') {
-    closeFullscreen()
-  }
+function updateImageIndex(index: number) {
+  imageModalCurrentIndex.value = index
 }
 
 onMounted(() => {
@@ -131,7 +139,9 @@ onUnmounted(() => {
 })
 
 if (!project) {
-  router.replace({ name: 'projects' })
+  router.replace({ name: 'not-found' })
+} else if (!(project.longDescription || project.features || project.challenges || project.architectureImage)) {
+  router.replace({ name: 'not-found' })
 }
 
 const labels = {
@@ -150,7 +160,7 @@ const labels = {
 </script>
 
 <template>
-  <section class="project-detail" v-if="project" @keydown="handleKeydown">
+  <section class="project-detail" v-if="project">
     <template v-if="isDetailedProject">
       <div class="mobile-tabs">
         <button
@@ -254,7 +264,7 @@ const labels = {
                     />
                   </div>
                 </div>
-                <!-- Group 2 (Duplicate for seamless loop - only on large screens) -->
+                <!-- Group 2  -->
                 <div class="vertical-group duplicate-group">
                   <div
                     v-for="(img, index) in project.images"
@@ -275,14 +285,14 @@ const labels = {
       </div>
     </template>
 
-    <Teleport to="body">
-      <div v-if="fullscreenImage" class="fullscreen-modal" @click.self="closeFullscreen">
-        <button class="close-btn" @click="closeFullscreen" aria-label="Close fullscreen">
-          <X :size="32" />
-        </button>
-        <img :src="fullscreenImage" :alt="project.title[currentLang]" />
-      </div>
-    </Teleport>
+    <ImageModal
+      :visible="imageModalVisible"
+      :images="allImages"
+      :current-index="imageModalCurrentIndex"
+      :title="project?.title[currentLang]"
+      @close="closeImageModal"
+      @update:current-index="updateImageIndex"
+    />
   </section>
 </template>
 
@@ -575,11 +585,41 @@ const labels = {
   padding: 2rem;
 }
 
-.fullscreen-modal img {
+.image-wrapper {
+  position: relative;
   max-width: 95%;
   max-height: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen-modal img {
+  max-width: 100%;
+  max-height: 95vh;
   object-fit: contain;
   border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.click-area {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.click-left {
+  left: 0;
+  cursor: w-resize;
+}
+
+.click-right {
+  right: 0;
+  cursor: e-resize;
 }
 
 .close-btn {
@@ -597,11 +637,59 @@ const labels = {
   justify-content: center;
   transition: all 0.2s ease;
   backdrop-filter: blur(4px);
+  z-index: 20;
 }
 
 .close-btn:hover {
   background: rgba(0, 0, 0, 0.9);
   transform: scale(1.1);
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 1rem;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  z-index: 20;
+}
+
+.nav-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-prev {
+  left: 2rem;
+}
+
+.nav-next {
+  right: 2rem;
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  z-index: 20;
 }
 
 /* Responsive */
@@ -660,6 +748,34 @@ const labels = {
   .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Fullscreen modal responsive */
+  .nav-btn {
+    padding: 0.75rem;
+  }
+
+  .nav-prev {
+    left: 1rem;
+  }
+
+  .nav-next {
+    right: 1rem;
+  }
+
+  .close-btn {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem;
+  }
+
+  .image-counter {
+    bottom: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .click-area {
+    width: 45%;
   }
 }
 </style>

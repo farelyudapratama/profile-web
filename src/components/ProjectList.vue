@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import gsap from 'gsap'
 import ProjectCard from '@/components/ProjectCard.vue'
 import ContextMenu from '@/components/ContextMenu.vue'
+import ImageModal from '@/components/ImageModal.vue'
 import { projects as allProjects, type Project as ProjectType } from '@/data/projects'
 import { useLanguageStore } from '@/stores/language'
 import { useProjectContextMenu } from '@/composables/useProjectContextMenu'
@@ -24,9 +25,54 @@ const searchQuery = ref('')
 const selectedTag = ref('')
 const grid = ref<HTMLElement | null>(null)
 
-// Get all the composable values
-const { contextMenuState, contextMenuItems, showContextMenu, closeContextMenu, modal, closeModal } =
-  useProjectContextMenu()
+// Handle context menu "enlarge image" action
+function handleEnlargeImage(projectId: number | null) {
+  if (projectId) {
+    const imageData = openImageFor(projectId)
+    if (imageData) {
+      imageModalImages.value = imageData.images
+      imageModalTitle.value = imageData.title
+      imageModalCurrentIndex.value = 0 // Mulai dari gambar pertama
+      imageModalVisible.value = true
+    }
+  }
+}
+
+// Dapatkan semua nilai composable - atur callback untuk aksi perbesar gambar
+const { contextMenuState, contextMenuItems, showContextMenu, closeContextMenu, openImageFor } =
+  useProjectContextMenu({ onEnlargeImage: handleEnlargeImage })
+
+const imageModalVisible = ref(false)
+const imageModalImages = ref<string[]>([])
+const imageModalCurrentIndex = ref(0)
+const imageModalTitle = ref('')
+
+function openImageModal(imageSrc: string, projectId: number) {
+  const project = projects.value.find((p) => p.id === projectId)
+  if (!project) return
+
+  // Bikin array semua gambar
+  const images = project.images || []
+  if (project.architectureImage) {
+    imageModalImages.value = [...images, project.architectureImage]
+  } else {
+    imageModalImages.value = images
+  }
+
+  // Cari index gambar yang diklik
+  imageModalCurrentIndex.value = imageModalImages.value.indexOf(imageSrc)
+  imageModalTitle.value = project.title[useLanguageStore().currentLang] || project.title.en
+
+  imageModalVisible.value = true
+}
+
+function closeImageModal() {
+  imageModalVisible.value = false
+}
+
+function updateImageIndex(index: number) {
+  imageModalCurrentIndex.value = index
+}
 
 type FilteredProjects = ProjectType[]
 const filteredProjects = computed<FilteredProjects>(() => {
@@ -162,6 +208,7 @@ onBeforeUnmount(() => {
         :project="project"
         :data-id="project.id"
         class="project-card"
+        @open-image="openImageModal"
         @contextmenu="
           (event: MouseEvent) => {
             event.preventDefault()
@@ -180,14 +227,15 @@ onBeforeUnmount(() => {
       @close="closeContextMenu"
     />
 
-    <!-- image modal -->
-    <div v-if="modal.visible" class="image-modal" @click.self="closeModal">
-      <div class="modal-content">
-        <img :src="modal.src" :alt="modal.title" />
-        <p class="modal-title">{{ modal.title }}</p>
-        <button class="btn btn-outline" @click="closeModal">{{ t('close') }}</button>
-      </div>
-    </div>
+    <!-- Reusable image modal -->
+    <ImageModal
+      :visible="imageModalVisible"
+      :images="imageModalImages"
+      :current-index="imageModalCurrentIndex"
+      :title="imageModalTitle"
+      @close="closeImageModal"
+      @update:current-index="updateImageIndex"
+    />
   </div>
 </template>
 
@@ -276,39 +324,6 @@ onBeforeUnmount(() => {
   flex: 1;
   border-radius: 0%;
   justify-content: center;
-}
-
-/* image modal overlay */
-.image-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(6px);
-  background: rgba(6, 6, 10, 0.45);
-}
-.modal-content {
-  max-width: 92vw;
-  max-height: 86vh;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-  border: 1px solid var(--color-border);
-  padding: 1rem;
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-.modal-content img {
-  max-width: 88vw;
-  max-height: 72vh;
-  object-fit: contain;
-}
-.modal-title {
-  color: var(--color-text);
-  font-weight: 600;
 }
 
 /* responsive */

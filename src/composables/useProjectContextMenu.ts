@@ -4,9 +4,13 @@ import { useLanguageStore } from '@/stores/language'
 
 type Project = ProjectType
 
-export function useProjectContextMenu() {
+interface ProjectContextMenuOptions {
+  onEnlargeImage?: (projectId: number | null) => void
+}
+
+export function useProjectContextMenu(options: ProjectContextMenuOptions = {}) {
   const projects = ref<Project[]>(allProjects)
-  
+
   const contextMenuState = ref({
     visible: false,
     x: 0,
@@ -69,22 +73,38 @@ export function useProjectContextMenu() {
     closeContextMenu()
   }
 
-  const modal = ref({ visible: false, src: '', title: '' })
-
+  // We'll return a function that can be used to handle image modal opening
+  // This is handled by the parent component now
   const openImageFor = (projectId: number | null) => {
+    // This function now just returns the project data needed by parent
     const p = projects.value.find((x) => x.id === projectId)
     if (p) {
-      modal.value = {
-        visible: true,
-        src: p.images[0],
+      return {
+        images: [...(p.images || []), ...(p.architectureImage ? [p.architectureImage] : [])],
         title: p.title[useLanguageStore().currentLang],
+        startIndex: 0, // default to first image
       }
     }
-    closeContextMenu()
+    return null
   }
 
-  function closeModal() {
-    modal.value.visible = false
+  // Function to get project data for image modal
+  const getProjectImageData = (projectId: number | null) => {
+    const p = projects.value.find((x) => x.id === projectId)
+    if (!p) return null
+
+    // Build all images array
+    const images = p.images || []
+    if (p.architectureImage) {
+      return {
+        images: [...images, p.architectureImage],
+        title: p.title[useLanguageStore().currentLang] || p.title.en,
+      }
+    }
+    return {
+      images: images,
+      title: p.title[useLanguageStore().currentLang] || p.title.en,
+    }
   }
 
   const contextMenuItems = computed(() => {
@@ -105,7 +125,12 @@ export function useProjectContextMenu() {
       { separator: true, label: '' },
       {
         label: t('enlargeImage'),
-        action: () => openImageFor(project.id),
+        action: () => {
+          if (options.onEnlargeImage) {
+            options.onEnlargeImage(selectedProject.value?.id || null)
+          }
+          closeContextMenu()
+        },
       },
     ]
 
@@ -118,8 +143,7 @@ export function useProjectContextMenu() {
     contextMenuItems,
     showContextMenu,
     closeContextMenu,
-    modal,
-    openImageFor,
-    closeModal,
+    getProjectImageData,
+    openImageFor: getProjectImageData, // Keep the same name for compatibility
   }
 }
