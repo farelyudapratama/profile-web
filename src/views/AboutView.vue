@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onUnmounted, ref, reactive } from 'vue'
 import { MoveRight, ScrollText } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
+import gsap from 'gsap'
 import TechStack from '../components/TechStack.vue'
 
 const router = useRouter()
@@ -13,6 +14,18 @@ const navigateToResume = () => {
 }
 
 const currentLang = computed(() => languageStore.currentLang || 'id')
+const imageRef = ref<HTMLElement | null>(null)
+// Animation configuration constants
+const ANIMATION_CONFIG = {
+  fadeOut: { rotation: 360, scale: 0.1, opacity: 0, duration: 0.5, ease: 'power2.out' },
+  fadeIn: { rotation: 720, scale: 1, opacity: 1, duration: 0.5, ease: 'power2.in' },
+}
+
+const imageState = reactive({
+  currentImage: '/img/photo.png',
+  defaultImage: '/img/photo.png',
+  otherImages: ['/img/ismine/l1.jpg', '/img/ismine/l2.jpg', '/img/ismine/l3.webp'],
+})
 
 const textData = {
   aboutMe: { id: 'Tentang Saya', en: 'About Me' },
@@ -40,6 +53,60 @@ const textData = {
     en: 'Some of the technologies I use',
   },
 }
+
+// Helper function for image transition animation
+const animateImageTransition = (newImage: string) => {
+  if (!imageRef.value) return
+
+  gsap.to(imageRef.value, {
+    ...ANIMATION_CONFIG.fadeOut,
+    onComplete: () => {
+      try {
+        // Update the current image
+        imageState.currentImage = newImage
+
+        // Animate the new image back in
+        gsap.to(imageRef.value!, {
+          ...ANIMATION_CONFIG.fadeIn,
+        })
+      } catch (error) {
+        console.error('Error during image transition:', error)
+        // Fallback: ensure the default image is shown if there's an error
+        imageState.currentImage = imageState.defaultImage
+      }
+    },
+  })
+}
+
+const handleImageClick = () => {
+  if (!imageRef.value) return
+
+  // Check if current image is the default image
+  if (imageState.currentImage === imageState.defaultImage) {
+    // If current image is default, transition to a random other image
+    if (imageState.otherImages.length > 0) {
+      const randomIndex = Math.floor(Math.random() * imageState.otherImages.length)
+      const randomImage = imageState.otherImages[randomIndex]
+      animateImageTransition(randomImage)
+    }
+  } else {
+    // If current image is not the default, transition back to default
+    animateImageTransition(imageState.defaultImage)
+  }
+}
+
+// Cleanup function to stop any ongoing animations when component is unmounted
+const cleanup = () => {
+  if (imageRef.value) {
+    // Kill any ongoing GSAP animations on the image element
+    gsap.killTweensOf(imageRef.value)
+  }
+}
+
+// Call cleanup when component is unmounted
+onUnmounted(() => {
+  cleanup()
+})
 </script>
 
 <template>
@@ -59,7 +126,15 @@ const textData = {
       </article>
 
       <aside class="about__image">
-        <img src="/img/photo.png" :alt="`Foto Farel - ${textData.aboutMe[currentLang]}`" />
+        <div class="image-wrapper" @click="handleImageClick">
+          <div class="image-border"></div>
+          <img
+            ref="imageRef"
+            :src="imageState.currentImage"
+            :alt="`Foto Farel - ${textData.aboutMe[currentLang]}`"
+            class="animated-image"
+          />
+        </div>
         <a
           @click="navigateToResume"
           target="_blank"
@@ -120,6 +195,35 @@ const textData = {
   border-style: solid;
   border-color: var(--color-border);
   cursor: pointer;
+}
+
+.image-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 260px;
+  height: 320px;
+  cursor: pointer;
+}
+
+.image-border {
+  position: absolute;
+  width: 260px;
+  height: 320px;
+  border-width: 4px 4px 0 4px;
+  border-style: solid;
+  border-color: var(--color-border);
+  z-index: 1;
+}
+
+.animated-image {
+  width: 260px;
+  height: 320px;
+  object-fit: cover;
+  cursor: pointer;
+  z-index: 2;
+  position: relative;
 }
 
 .resume-button {
@@ -186,6 +290,70 @@ const textData = {
   }
   .resume-button {
     width: 160px;
+  }
+}
+
+/* ===== MOBILE XS (max-width: 480px) ===== */
+@media (max-width: 480px) {
+  .about {
+    padding: 1.5rem 1.2rem;
+  }
+
+  .about__content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Typography */
+  .subtitle {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+
+  .heading-2 {
+    font-size: 1.35rem;
+  }
+
+  /* Image container */
+  .about__image {
+    margin-top: 0.5rem;
+  }
+
+  .image-wrapper,
+  .about__image img,
+  .image-border {
+    width: 140px !important;
+    height: 180px !important;
+  }
+
+  /* Resume Button */
+  .resume-button {
+    width: 100% !important;
+    max-width: 240px;
+    padding: 0.65rem 0;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .resume-text {
+    font-size: 0.9rem;
+  }
+
+  /* TechStack section */
+  .techstack-section {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .techstack-section .subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+
+  /* General spacing */
+  article {
+    margin-bottom: 1rem;
   }
 }
 </style>
