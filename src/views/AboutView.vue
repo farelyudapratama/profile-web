@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MoveRight, ScrollText } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
 import TechStack from '../components/TechStack.vue'
 
+const router = useRouter()
 const languageStore = useLanguageStore()
+
+const navigateToResume = () => {
+  router.push('/resume')
+}
 
 const currentLang = computed(() => languageStore.currentLang || 'id')
 
@@ -55,11 +61,10 @@ const textData = {
       <aside class="about__image">
         <img src="/img/photo.png" :alt="`Foto Farel - ${textData.aboutMe[currentLang]}`" />
         <a
-          href="/resume.pdf"
+          @click="navigateToResume"
           target="_blank"
           class="resume-button"
-          rel="noopener noreferrer"
-          aria-label="Buka resume Farel di tab baru"
+          aria-label="Buka resume Farel"
         >
           <MoveRight class="resume-icon left" />
           <span class="resume-text">{{ textData.resumeButton[currentLang] }}</span>
@@ -134,6 +139,7 @@ const textData = {
 .resume-button:hover {
   background-color: var(--color-text);
   color: var(--color-background);
+  cursor: pointer;
 }
 
 .resume-button .resume-icon {
