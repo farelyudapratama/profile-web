@@ -18,7 +18,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const currentImage = computed(() => {
-  if (props.images.length === 0) return null
+  if (props.images.length === 0) return undefined
   return props.images[props.currentIndex]
 })
 
@@ -100,12 +100,7 @@ defineExpose({
         </svg>
       </button>
 
-      <button
-        v-if="hasNext"
-        class="nav-btn nav-next"
-        @click="nextImage"
-        aria-label="Next image"
-      >
+      <button v-if="hasNext" class="nav-btn nav-next" @click="nextImage" aria-label="Next image">
         <svg
           width="24"
           height="24"
