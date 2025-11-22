@@ -5,6 +5,7 @@ import ContactView from '../views/ContactView.vue'
 // import AboutView from '../views/AboutView.vue'
 import ResumeView from '../views/ResumeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
+import WorkInProgressView from '../views/WorkInProgressView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,16 @@ const router = createRouter({
       path: '/resume',
       name: 'resume',
       component: ResumeView,
+    },
+    {
+      path: '/articles',
+      name: 'articles',
+      component: WorkInProgressView,
+    },
+    {
+      path: '/blog',
+      name: 'blog',
+      component: WorkInProgressView,
     },
     {
       path: '/:pathMatch(.*)*',

@@ -18,7 +18,7 @@ const navItems = ref([
     name: 'Extra',
     icon: Blocks,
     children: [
-      { name: 'Blog', path: '/#blog', icon: Blocks },
+      { name: 'Blog', path: '/blog', icon: Blocks },
       { name: 'Guestbook', path: '/#guestbook', icon: Blocks },
     ],
   },
