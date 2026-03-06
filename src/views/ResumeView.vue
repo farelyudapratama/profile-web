@@ -13,6 +13,17 @@ import {
 } from 'lucide-vue-next'
 import { useLanguageStore } from '@/stores/language'
 import { resumeData } from '@/data/resume'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Resume - Farel Yuda Pratama',
+  meta: [
+    {
+      name: 'description',
+      content: 'View the professional resume of Farel Yuda Pratama, including education, experience, and skills as a Full-Stack and Android Developer.',
+    },
+  ],
+})
 
 const languageStore = useLanguageStore()
 const currentLang = computed(() => languageStore.currentLang || 'id')

@@ -16,11 +16,7 @@ const {
   iconWidth = 100,
   iconHeight = 100,
   speed = 20,
-} = withDefaults(defineProps<Props>(), {
-  iconWidth: 100,
-  iconHeight: 100,
-  speed: 20,
-})
+} = defineProps<Props>()
 
 const containerRef = ref<HTMLElement | null>(null)
 const movingContainerRef = ref<HTMLDivElement | null>(null)

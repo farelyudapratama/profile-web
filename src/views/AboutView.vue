@@ -3,11 +3,22 @@ import { computed, onUnmounted, ref, reactive } from 'vue'
 import { MoveRight, ScrollText } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
+import { useHead } from '@unhead/vue'
 import gsap from 'gsap'
 import TechStack from '../components/TechStack.vue'
 
 const router = useRouter()
 const languageStore = useLanguageStore()
+
+useHead({
+  title: 'About Me - Farel Yuda Pratama',
+  meta: [
+    {
+      name: 'description',
+      content: 'Learn more about Farel Yuda Pratama, a passionate software engineering student from Universitas Gunadarma focusing on full-stack development.',
+    },
+  ],
+})
 
 const navigateToResume = () => {
   router.push('/resume')

@@ -1,8 +1,20 @@
 <script setup lang="ts">
+import { useHead } from '@unhead/vue'
 import ProjectList from '@/components/ProjectList.vue'
 import { useLanguageStore } from '@/stores/language'
 
 const lang = useLanguageStore()
+
+useHead({
+  title: 'Projects - Farel Yuda Pratama',
+  meta: [
+    {
+      name: 'description',
+      content: 'Explore the projects developed by Farel Yuda Pratama, including Android apps, web applications, and more.',
+    },
+  ],
+})
+
 const t = (key: string) => {
   const strings: Record<string, Record<string, string>> = {
     title: { en: 'My Projects', id: 'Proyek Saya' },

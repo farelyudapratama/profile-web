@@ -21,6 +21,17 @@
 </template>
 
 <script setup lang="ts">
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Contact - Farel Yuda Pratama',
+  meta: [
+    {
+      name: 'description',
+      content: 'Get in touch with Farel Yuda Pratama for collaborations, freelance work, or any inquiries about web and Android development.',
+    },
+  ],
+})
 </script>
 
 <style scoped>
